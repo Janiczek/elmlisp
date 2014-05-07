@@ -1,0 +1,10 @@
+(include "stdio.h")
+(defn "int" main ()
+  (def num 600851475143 p 2)
+  (while true
+    (while (== 0 (% num p))
+      (/= num p))
+    (when (<= num 1)
+      (printf "%d\n" p)
+      (break))
+    (++ p)))
