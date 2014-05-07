@@ -4,6 +4,9 @@
 
 L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
 
+## Keywords ##
+See [the source code](https://bitbucket.org/ktg/l/src).
+
 ## Examples ##
 ### Hello, World! ###
 ```
@@ -16,7 +19,7 @@ L++ is a programming language that transcompiles to C++. It uses Lisp-like synta
 
 `#|` nestable block comment `|#`
 
-See [Reading Comments](http://docs.racket-lang.org/reference/reader.html?q=%23%7C&q=comment#%28part._parse-comment%29)
+See [Reading Comments](http://docs.racket-lang.org/reference/reader.html?q=%23%7C&q=comment#%28part._parse-comment%29).
 
 ### Other examples ###
 
