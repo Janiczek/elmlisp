@@ -1,0 +1,3 @@
+(main
+  (def sum (fn ("int a" "int b") (return (+ a b))))
+  (prn (sum 1 2)))
