@@ -3,7 +3,7 @@
 ; L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
 ; (C) 2014 KIM Taegyoon
 
-(define version "0.1.1")
+(define version "0.1.2")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -38,14 +38,10 @@
              [(+ - * / << >>) (string-join (map compile-expr (rest e)) (symbol->string f) #:before-first "(" #:after-last ")")]
              ; (++ A) => (A++)
              [(++ --) (format "(~a~a)" f (compile-expr (second e)))]
-             ; (not A) => (!A)
-             [(not) (format "(!~a)" (compile-expr (second e)))]
-             ; (< A B) => (< A B)
-             [(< <= > >= == != % = += -= *= /=) (format "(~a~a~a)" (compile-expr (second e)) f (compile-expr (third e)))]
-             ; (and A B) => (&& A B)
-             [(and) (format "(~a~a~a)" (compile-expr (second e)) "&&" (compile-expr (third e)))]
-             ; (or A B) => (|| A B)
-             [(or) (format "(~a~a~a)" (compile-expr (second e)) "||" (compile-expr (third e)))]             
+             ; (not A) => (not A)
+             [(not compl) (format "(~a ~a)" f (compile-expr (second e)))]
+             ; (< A B) => (A < B) ; binary operators
+             [(< <= > >= == != % = += -= *= /= %= and and_eq bitand bitor not_eq or or_eq xor xor_eq) (format "(~a ~a ~a)" (compile-expr (second e)) f (compile-expr (third e)))]
              ; (return A) => return A
              [(return) (format "return ~a" (compile-expr (second e)))]
              ; (? TEST THEN ELSE) => (TEST ? THEN : ELSE)
