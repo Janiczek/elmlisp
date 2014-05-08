@@ -80,7 +80,7 @@
              ; (goto ID) => goto ID
              [(goto) (format "goto ~a" (second e))]
              ; (switch EXPR BODY ...) => switch (EXPR) {BODY; ...;}
-             [((switch) (format "switch (~a) {\n~a;}" (second e) (string-join (map compile-expr (drop e 2)) ";\n")))]
+             [(switch) (format "switch (~a) {\n~a;}" (second e) (string-join (map compile-expr (drop e 2)) ";\n"))]
              ; (case EXPR ...) => case EXPR: case ...:
              [(case) (string-join (for/list ([x (rest e)]) (format "case ~a:" x)))]
              ; (default) => default:
