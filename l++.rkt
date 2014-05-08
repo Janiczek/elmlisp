@@ -34,7 +34,7 @@
              [(defn) (format "~a ~a(~a) {\n~a;}\n" (list-ref e 1) (list-ref e 2) (string-join (list-ref e 3) ",") (string-join (map compile-expr (drop e 4)) ";\n"))]
              ; (def a 3 b 4.0 ...) => auto a = 3; auto b = 4.0; ...
              [(def) (string-join (for/list ([i (in-range 1 (length e) 2)]) (format "auto ~a=~a" (list-ref e i) (compile-expr (list-ref e (add1 i))))) ";\n")]
-             ; (+ A B C)
+             ; (+ A B C ...)
              [(+ - * / << >>) (string-join (map compile-expr (rest e)) (symbol->string f) #:before-first "(" #:after-last ")")]
              ; (++ A)
              [(++ --) (format "(~a~a)" f (compile-expr (second e)))]
