@@ -3,7 +3,7 @@
 ; L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
 ; (C) 2014 KIM Taegyoon
 
-(define version "0.1.4")
+(define version "0.1.5")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -63,8 +63,8 @@
              [(at) (format "~a[~a]" (second e) (compile-expr (third e)))]
              ; (break) => break
              [(break continue) (~a f)]
-             ; (main BODY ...) => int main(int argc, char **argv) {BODY; ...}
-             [(main) (format "int main(int argc, char **argv) {\n~a;}" (string-join (map compile-expr (rest e)) ";\n"))]
+             ; (main BODY ...) => int main(int argc, char **argv) {BODY; ...; return 0;}
+             [(main) (format "int main(int argc, char **argv) {\n~a; return 0;}" (string-join (map compile-expr (rest e)) ";\n"))]
              ; (pr A ...) => std::cout << A << ...
              [(pr) (format "std::cout ~a" (string-join (for/list ([a (rest e)]) (~a "<< " (compile-expr a)))))]
              ; (prn A ...) => std::cout << A << ... << std::endl

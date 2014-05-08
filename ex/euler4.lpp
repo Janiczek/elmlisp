@@ -15,12 +15,11 @@
     (++ k))
   (return pal))
 
-(defn "int" main ()
+(main
   (def maxP 0)
   (for (def i 999) (>= i 100) (-- i)
      (for (def j 999) (>= j i) (-- j)
        (def p (* i j))
        (if (and (> p maxP) (isPalindrome p))
           (= maxP p))))
-  (std::printf "%d\n" maxP)
-  (return 0))
+  (std::printf "%d\n" maxP))
