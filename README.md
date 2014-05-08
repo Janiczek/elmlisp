@@ -25,7 +25,7 @@ See [Reading Comments](http://docs.racket-lang.org/reference/reader.html?q=%23%7
 
 ### Other examples ###
 
-Other examples are in the `ex` directory.
+Other examples are in the [`ex` directory](https://bitbucket.org/ktg/l/src).
 
 ### [99 Bottles of Beer](http://en.wikipedia.org/wiki/99_Bottles_of_Beer) ###
 ```
