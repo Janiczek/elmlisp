@@ -26,6 +26,24 @@ Macros are supported via [Racket's macro system](http://docs.racket-lang.org/gui
   (prn "Hello, World!"))
 ```
 
+Run with
+
+```
+$racket l++.rkt < ex/hello.lpp 
+L++ Compiler 0.2.1 (C) 2014 KIM Taegyoon
+Code (EOF when done)> Compiled:
+#include <iostream>
+int main(int argc, char **argv) {
+std::cout << "Hello, World!" << std::endl;
+return 0;};
+
+Current directory: /Users/phoniz/w/playground/l++/l/
+Output written to: a-out.cpp
+Binary written to: a-out
+Hello, World!
+#t
+```
+
 ### Other examples ###
 
 Other examples are in the [`ex` directory](https://bitbucket.org/ktg/l/src).

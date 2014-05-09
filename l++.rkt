@@ -110,6 +110,9 @@
 (define dir (current-directory))
 (displayln (format "Current directory: ~a" dir))
 (displayln (format "Output written to: ~a" outsrc))
-(when (system (format "g++ -std=c++11 -O3 -s -static -o ~a ~a" outbin outsrc))
+(when 
+  (if (equal? (system-type) 'macosx)
+      (system (format "g++ -std=c++11 -O3 -o ~a ~a" outbin outsrc))
+      (system (format "g++ -std=c++11 -O3 -s -static -o ~a ~a" outbin outsrc)))
   (displayln (format "Binary written to: ~a" outbin))
   (system (format "~a~a" dir outbin)))
