@@ -80,7 +80,7 @@
              ; (default) => default:
              [(default) "default:"]
              ; (fn ("int a" "int b") (return (+ a b))) => [&](int a, int b) {return a + b;}
-             [(fn) (format "[&](~a) {\n~a;}\n" (string-join (second e) ",") (string-join (map compile-expr (drop e 2)) ";\n"))]
+             [(fn) (format "[&](~a) {\n~a;}" (string-join (second e) ",") (string-join (map compile-expr (drop e 2)) ";\n"))]
              ; (code "CODE") => CODE as-is
              [(code) (~a (second e))]
              ; (F ARG ...) => F(ARG, ...)
