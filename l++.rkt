@@ -64,7 +64,7 @@
              ; (break) => break
              [(break continue) (~a f)]
              ; (main BODY ...) => int main(int argc, char **argv) {BODY; ...; return 0;}
-             [(main) (format "int main(int argc, char **argv) {\n~a; return 0;}" (string-join (map compile-expr (rest e)) ";\n"))]
+             [(main) (format "int main(int argc, char **argv) {\n~a;\nreturn 0;}" (string-join (map compile-expr (rest e)) ";\n"))]
              ; (pr A ...) => std::cout << A << ...
              [(pr) (format "std::cout ~a" (string-join (for/list ([a (rest e)]) (~a "<< " (compile-expr a)))))]
              ; (prn A ...) => std::cout << A << ... << std::endl
