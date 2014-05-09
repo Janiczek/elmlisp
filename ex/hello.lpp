@@ -1,0 +1,3 @@
+(main
+  (prn "Hello, World!"))
+
