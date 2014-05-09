@@ -7,7 +7,7 @@ L++ is a programming language that transcompiles to C++. It uses Lisp-like synta
 ## Syntax and semantics ##
 See [the source code](https://bitbucket.org/ktg/l/src).
 
-### Comment ###
+### Comments ###
 `;` `#!` end-of-line comment
 
 `#|` nestable block comment `|#`
@@ -15,6 +15,9 @@ See [the source code](https://bitbucket.org/ktg/l/src).
 `#;` S-expression comment
 
 See [Reading Comments](http://docs.racket-lang.org/reference/reader.html?q=%23%7C&q=comment#%28part._parse-comment%29).
+
+### Macros ###
+Macros are supported via [Racket's macro system](http://docs.racket-lang.org/guide/macros.html) [`define-syntax`](http://docs.racket-lang.org/reference/define.html?q=define-syntax#%28form._%28%28lib._racket%2Fprivate%2Fbase..rkt%29._define-syntax%29%29).
 
 ## Examples ##
 ### Hello, World! ###

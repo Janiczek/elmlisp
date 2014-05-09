@@ -1,0 +1,19 @@
+(define-syntax sum
+  (syntax-rules ()
+    [(sum) 0]
+    [(sum a) a]
+    [(sum a b) (+ a b)]
+    [(sum a b ...) (+ a (sum b ...))]))
+
+(define-syntax infix
+  (syntax-rules ()
+    [(infix a op b) (op a b)]))    
+
+(define-syntax ret
+  (syntax-rules ()
+    [(ret a) (return a)]))
+    
+(main
+  (prn (sum 1 2 3 4))
+  (prn (infix 1 + 2))
+  (ret 1))

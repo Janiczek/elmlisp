@@ -3,7 +3,7 @@
 ; L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
 ; (C) 2014 KIM Taegyoon
 
-(define version "0.1.5")
+(define version "0.2")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -24,10 +24,19 @@
 ;(displayln "Parsed:")
 ;(write parsed) (newline)
 
+(define-namespace-anchor anc)
+(define ns (namespace-anchor->namespace anc))
+(define (macroexpand-1 lst)
+  (syntax->datum (expand-to-top-form (eval `(syntax ,lst) ns))))
+
 (define (compile-expr e)
-  (cond [(list? e)
+  (cond [(and (list? e) (not (empty? e)))
+         (unless (equal? (first e) 'define-syntax)
+             (set! e (macroexpand-1 e)))
          (let ([f (first e)])
            (case f
+             ; (define-syntax ...) ; defines a macro
+             [(define-syntax) (eval e ns) ""]
              ; (include "file1.h" ...) => #include "file1.h" ...
              [(include) (string-join (for/list ([x (rest e)]) (format "#include ~s\n" x)) "")]
              ; (defn "int" main ("int argc" "char *argv[]") (return 0))
@@ -35,7 +44,7 @@
              ; (def a 3 b 4.0 ...) => auto a = 3; auto b = 4.0; ...
              [(def) (string-join (for/list ([i (in-range 1 (length e) 2)]) (format "auto ~a=~a" (list-ref e i) (compile-expr (list-ref e (add1 i))))) ";\n")]
              ; (+ A B C ...) => (A + B + C + ...)
-             [(+ - * / << >>) (string-join (map compile-expr (rest e)) (symbol->string f) #:before-first "(" #:after-last ")")]
+             [(+ - * / << >>) (string-join (map compile-expr (rest e)) (~a f) #:before-first "(" #:after-last ")")]
              ; (++ A) => (++ A) ; unary operators
              [(++ -- not compl) (format "(~a ~a)" f (compile-expr (second e)))]
              ; (< A B) => (A < B) ; binary operators
