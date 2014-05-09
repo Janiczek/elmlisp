@@ -1,3 +1,7 @@
 (main
-  (def sum (fn ("int a" "int b") (return (+ a b))))
-  (prn (sum 1 2)))
+  (def d (fn ("double x") (return (- (* x x) 0.5))))
+  (def adder (fn ("int x") (return (fn ("int y") (return (+ x y))))))
+  (def add1 (adder 1))
+  (prn "hello world")
+  (prn (d 2.0))
+  (prn (add1 2)))
