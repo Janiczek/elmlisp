@@ -29,7 +29,9 @@ Macros are supported via [Racket's macro system](http://docs.racket-lang.org/gui
 Run with
 
 ```
-$racket l++.rkt < ex/hello.lpp 
+#!c++
+
+$ racket l++.rkt < ex/hello.lpp
 L++ Compiler 0.2.1 (C) 2014 KIM Taegyoon
 Code (EOF when done)> Compiled:
 #include <iostream>
