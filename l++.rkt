@@ -96,7 +96,7 @@
              [(code) (~a (second e))]
              ; (F ARG ...) => F(ARG, ...)
              [else (format "~a(~a)" f (string-join (map compile-expr (drop e 1)) ","))]))]
-        [else (format (if (symbol? e) "~a" "~s") e)]))
+        [else (~s e)]))
 
 (define prolog "#include <iostream>\n")
 (define compiled (~a prolog (string-join (map compile-expr parsed) ";\n" #:after-last ";\n")))
@@ -111,8 +111,8 @@
 (displayln (format "Current directory: ~a" dir))
 (displayln (format "Output written to: ~a" outsrc))
 (when 
-  (if (equal? (system-type) 'macosx)
-      (system (format "g++ -std=c++11 -O3 -o ~a ~a" outbin outsrc))
-      (system (format "g++ -std=c++11 -O3 -s -static -o ~a ~a" outbin outsrc)))
+    (if (equal? (system-type) 'macosx)
+        (system (format "g++ -std=c++11 -O3 -o ~a ~a" outbin outsrc))
+        (system (format "g++ -std=c++11 -O3 -s -static -o ~a ~a" outbin outsrc)))
   (displayln (format "Binary written to: ~a" outbin))
   (system (format "~a~a" dir outbin)))
