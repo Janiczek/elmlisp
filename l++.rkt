@@ -3,7 +3,7 @@
 ; L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
 ; (C) 2014 KIM Taegyoon
 
-(define version "0.2.1")
+(define version "0.2.2")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -29,7 +29,7 @@
 (define (macroexpand-1 lst)
   (syntax->datum (expand-to-top-form (eval `(syntax ,lst) ns))))
 
-(define macros (set))
+(define macros (mutable-set))
 
 (define (compile-expr e)
   (cond [(and (list? e) (not (empty? e)))
@@ -38,7 +38,7 @@
          (let ([f (first e)])
            (case f
              ; (define-syntax ...) ; defines a macro
-             [(define-syntax) (let ([id (second e)]) (when (list? id) (set! id (first id))) (set! macros (set-add macros id))) (eval e ns) ""]
+             [(define-syntax) (let ([id (second e)]) (when (list? id) (set! id (first id))) (set-add! macros id)) (eval e ns) ""]
              ; (include "file1.h" ...) => #include "file1.h" ...
              [(include) (string-join (for/list ([x (rest e)]) (format "#include ~s\n" x)) "")]
              ; (defn "int" main ("int argc" "char *argv[]") (return 0))
