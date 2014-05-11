@@ -4,7 +4,7 @@
 ; (C) 2014 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.2.6")
+(define version "0.2.7")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -99,6 +99,8 @@
                  [(fn) (format "[&](~a) {\n~a;}" (string-join (second e) ",") (string-join (map compile-expr (drop e 2)) ";\n"))]
                  ; (code "CODE") => CODE as-is
                  [(code) (~a (second e))]
+                 ; (format form ...) ; compile-time formatting
+                 [(format) (apply format (second e) (map compile-expr (drop e 2)))]
                  ; (F ARG ...) => F(ARG, ...)
                  [else (format "~a(~a)" f (string-join (map compile-expr (drop e 1)) ","))])))]
         [else (~s e)]))
