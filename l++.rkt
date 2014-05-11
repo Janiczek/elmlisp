@@ -3,12 +3,12 @@
 ; L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
 ; (C) 2014 KIM Taegyoon
 
-(define version "0.2.4")
+(define version "0.2.5")
 (define (readline)
   (read-line (current-input-port) 'any))
 
 (displayln (format "L++ Compiler ~a (C) 2014 KIM Taegyoon" version))
-(display "Code (EOF when done)> ")
+(displayln "Enter code (EOF when done):")
 (define code "")
 (let loop ()
   (define line (readline))
