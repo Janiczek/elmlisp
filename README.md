@@ -17,7 +17,7 @@ See [the source code](https://bitbucket.org/ktg/l/src).
 See [Reading Comments](http://docs.racket-lang.org/reference/reader.html?q=%23%7C&q=comment#%28part._parse-comment%29).
 
 ### Macros ###
-Macros are supported via [Racket's macro system](http://docs.racket-lang.org/guide/macros.html) [`define-syntax`](http://docs.racket-lang.org/reference/define.html?q=define-syntax#%28form._%28%28lib._racket%2Fprivate%2Fbase..rkt%29._define-syntax%29%29) and [`define-syntax-rule`](http://docs.racket-lang.org/search/index.html?q=define-syntax-rule&q=define-syntax-rule&q=set-add%21&q=define-syntax&q=set&q=append&q=list-append&q=for&q=define-syntax).
+Macros are supported via [Racket's macro system](http://docs.racket-lang.org/guide/macros.html) [`define-syntax`](http://docs.racket-lang.org/reference/define.html?q=define-syntax#%28form._%28%28lib._racket%2Fprivate%2Fbase..rkt%29._define-syntax%29%29), [`define-syntax-rule`](http://docs.racket-lang.org/search/index.html?q=define-syntax-rule&q=define-syntax-rule&q=set-add%21&q=define-syntax&q=set&q=append&q=list-append&q=for&q=define-syntax) and [`defmacro`](http://docs.racket-lang.org/compatibility/defmacro.html).
 
 ## Examples ##
 ### Hello, World! ###

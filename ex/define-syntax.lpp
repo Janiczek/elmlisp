@@ -9,7 +9,11 @@
 
 (define-syntax-rule (ret a) (return a))
 
+(defmacro unless (pred a b)
+  `(if (not ,pred) ,a ,b))
+
 (main
   (prn (sum 1 2 3 4))
   (prn (infix 1 + 2))
+  (unless false (prn "Will print") (prn "Will not print"))
   (ret 1))
