@@ -33,7 +33,8 @@ Run with
 
 $ racket l++.rkt < ex/hello.lpp
 L++ Compiler (Version) (C) 2014 KIM Taegyoon
-Code (EOF when done)> Compiled:
+Enter code (EOF when done):
+Compiled:
 #include <iostream>
 int main(int argc, char **argv) {
 std::cout << "Hello, World!" << std::endl;
