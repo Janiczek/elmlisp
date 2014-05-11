@@ -4,7 +4,7 @@
 ; (C) 2014 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.2.7")
+(define version "0.2.8")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -119,7 +119,7 @@
 (displayln (format "Output written to: ~a" outsrc))
 (when 
     (if (equal? (system-type) 'macosx)
-        (system (format "g++ -std=c++11 -O3 -o ~a ~a" outbin outsrc))
-        (system (format "g++ -std=c++11 -O3 -s -static -o ~a ~a" outbin outsrc)))
+        (system (format "c++ -std=c++11 -O3 -o ~a ~a" outbin outsrc))
+        (system (format "c++ -std=c++11 -O3 -s -static -o ~a ~a" outbin outsrc)))
   (displayln (format "Binary written to: ~a" outbin))
   (system (format "~a~a" dir outbin)))
