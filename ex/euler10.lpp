@@ -1,4 +1,4 @@
-(include "iostream" "vector")
+(include "vector")
 
 (defn std::vector<int> primesUnder (int limit)
   (decl std::vector<bool> |p(limit)|)
@@ -22,4 +22,4 @@
     primes (primesUnder 2000000))
   (foreach p primes
     (+= sum p))
-  (<< std::cout sum std::endl))
+  (prn sum))
