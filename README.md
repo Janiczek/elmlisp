@@ -44,7 +44,6 @@ Current directory: /Users/phoniz/w/playground/l++/l/
 Output written to: a-out.cpp
 Binary written to: a-out
 Hello, World!
-#t
 ```
 
 ### Other examples ###
