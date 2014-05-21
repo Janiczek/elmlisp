@@ -1,16 +1,14 @@
-(include "cstdio")
-
-(defn "bool" isPrime ("int n")
+(defn bool isPrime (int n)
   (for (def i 2) (<= (* i i) n) (++ i)
     (if (== 0 (% n i)) (return false)))
   (return true))
   
-(defn "int" main ()
+(main
   (def count 0 i 2)
   (while true
     (when (isPrime i)
       (++ count)
       (when (== count 10001)
-        (std::printf "%d\n" i)
+        (prn i)
         (break)))
     (++ i)))

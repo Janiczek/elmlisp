@@ -1,6 +1,6 @@
 (include "cstdio")
 
-(defn "int" main ()
+(main
   (def sumN 0 sqSum 0)
   (for (def i 1) (<= i 100) (++ i)
     (+= sumN i)

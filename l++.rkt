@@ -4,7 +4,7 @@
 ; (C) 2014 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.2.8")
+(define version "0.3")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -46,10 +46,12 @@
                  [(defmacro) (set-add! macros (second e)) (eval e ns) ""]
                  ; (include "file1.h" ...) => #include "file1.h" ...
                  [(include) (string-join (for/list ([x (rest e)]) (format "#include ~s\n" x)) "")]
-                 ; (defn "int" main ("int argc" "char *argv[]") (return 0))
-                 [(defn) (format "~a ~a(~a) {\n~a;}\n" (list-ref e 1) (list-ref e 2) (string-join (list-ref e 3) ",") (string-join (map compile-expr (drop e 4)) ";\n"))]
+                 ; (defn int main (int argc char *argv[]) (return 0))
+                 [(defn) (format "~a ~a(~a) {\n~a;}\n" (list-ref e 1) (list-ref e 2) (let [(args (fourth e))] (string-join (for/list ([i (in-range 0 (length args) 2)]) (format "~a ~a" (list-ref args i) (list-ref args (add1 i)))) ",")) (string-join (map compile-expr (drop e 4)) ";\n"))]
                  ; (def a 3 b 4.0 ...) => auto a = 3; auto b = 4.0; ...
                  [(def) (string-join (for/list ([i (in-range 1 (length e) 2)]) (format "auto ~a=~a" (list-ref e i) (compile-expr (list-ref e (add1 i))))) ";\n")]
+                 ; (decl char s[10] "") => char s[10]="" ; declares a variable
+                 [(decl) (~a (second e) " " (third e) (if (<= (length e) 3) "" (~a "=" (compile-expr (fourth e)))))]
                  ; (+ A B C ...) => (A + B + C + ...)
                  [(+ - * / << >>) (string-join (map compile-expr (rest e)) (~a f) #:before-first "(" #:after-last ")")]
                  ; (++ A) => (++ A) ; unary operators
@@ -95,8 +97,8 @@
                  [(case) (string-join (for/list ([x (rest e)]) (format "case ~a:" x)))]
                  ; (default) => default:
                  [(default) "default:"]
-                 ; (fn ("int a" "int b") (return (+ a b))) => [&](int a, int b) {return a + b;}
-                 [(fn) (format "[&](~a) {\n~a;}" (string-join (second e) ",") (string-join (map compile-expr (drop e 2)) ";\n"))]
+                 ; (fn (int a int b) (return (+ a b))) => [&](int a, int b) {return a + b;}
+                 [(fn) (format "[&](~a) {\n~a;}" (let [(args (second e))] (string-join (for/list ([i (in-range 0 (length args) 2)]) (format "~a ~a" (list-ref args i) (list-ref args (add1 i)))) ",")) (string-join (map compile-expr (drop e 2)) ";\n"))]
                  ; (code "CODE") => CODE as-is
                  [(code) (~a (second e))]
                  ; (format form ...) ; compile-time formatting

@@ -1,5 +1,5 @@
 (include "stdio.h")
-(defn "int" main ()
+(defn int main ()
   (def num 600851475143 p 2)
   (while true
     (while (== 0 (% num p))

@@ -1,8 +1,6 @@
 ; Project Euler 5
-(include "cstdio")
-    
-(defn "int" main ()
+(main
   (def n 20)
   (for (def i 19) (>= i 2) (-- i)
     (when (!= 0 (% n i)) (+= n 20) (= i 20)))
-  (std::printf "%d\n" n))
+  (prn n))

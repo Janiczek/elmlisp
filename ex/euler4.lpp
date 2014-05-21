@@ -1,8 +1,8 @@
 ; Project Euler 4
 (include "cstdio" "cstring")
     
-(defn "bool" isPalindrome ("int p")
-  (code "char ps[10]")
+(defn bool isPalindrome (int p)  
+  (decl char |ps[10]|)
   (std::sprintf ps "%d" p)
   (def len (std::strlen ps)
     to (/ len 2)

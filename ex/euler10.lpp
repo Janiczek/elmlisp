@@ -1,7 +1,7 @@
 (include "iostream" "vector")
 
-(defn "std::vector<int>" primesUnder ("int limit")
-  (code "std::vector<bool> p(limit)")
+(defn std::vector<int> primesUnder (int limit)
+  (decl std::vector<bool> |p(limit)|)
   (if (>= limit 3)
     (= (at p 2) true))
   (for (def i 3) (< i limit) (+= i 2)
@@ -11,7 +11,7 @@
       (continue))
     (for (def j (* i 2)) (< j limit) (+= j i)
       (= (at p j) false)))  
-  (code "std::vector<int> r")
+  (decl std::vector<int> r)
   (for (def i 2) (< i limit) (++ i)
     (if (at p i)
       (r.push_back i)))
