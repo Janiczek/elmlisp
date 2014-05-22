@@ -116,6 +116,8 @@ Hello, World!
 
 Other examples are in the [`ex` directory](https://bitbucket.org/ktg/l/src).
 
+[L++ on Rosetta Code](http://rosettacode.org/wiki/Category:L%2B%2B)
+
 ### [99 Bottles of Beer](http://en.wikipedia.org/wiki/99_Bottles_of_Beer) ###
 ```
 (main
