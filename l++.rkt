@@ -4,7 +4,7 @@
 ; (C) 2014 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.3.1")
+(define version "0.3.2")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -78,7 +78,7 @@
                  ; (do/e EXPR ...) => (EXPR, ...)
                  [(do/e) (string-join (map compile-expr (rest e)) "," #:before-first "(" #:after-last ")")]
                  ; (at ARRAY POSITION) => ARRAY[POSITION]
-                 [(at) (format "~a[~a]" (second e) (compile-expr (third e)))]
+                 [(at) (format "~a[~a]" (compile-expr (second e)) (compile-expr (third e)))]
                  ; (break) => break
                  [(break continue) (~a f)]
                  ; (main BODY ...) => int main(int argc, char **argv) {BODY; ...; return 0;}
@@ -92,7 +92,7 @@
                  ; (goto ID) => goto ID
                  [(goto) (format "goto ~a" (second e))]
                  ; (switch EXPR BODY ...) => switch (EXPR) {BODY; ...;}
-                 [(switch) (format "switch (~a) {\n~a;}" (second e) (string-join (map compile-expr (drop e 2)) ";\n"))]
+                 [(switch) (format "switch (~a) {\n~a;}" (compile-expr (second e)) (string-join (map compile-expr (drop e 2)) ";\n"))]
                  ; (case EXPR ...) => case EXPR: case ...:
                  [(case) (string-join (for/list ([x (rest e)]) (format "case ~a:" x)))]
                  ; (default) => default:
@@ -104,7 +104,7 @@
                  ; (format form ...) ; compile-time formatting
                  [(format) (apply format (second e) (map compile-expr (drop e 2)))]
                  ; (F ARG ...) => F(ARG, ...)
-                 [else (format "~a(~a)" f (string-join (map compile-expr (drop e 1)) ","))])))]
+                 [else (format "~a(~a)" (compile-expr f) (string-join (map compile-expr (drop e 1)) ","))])))]
         [else (~s e)]))
 
 (define prolog "#include <iostream>\n")
