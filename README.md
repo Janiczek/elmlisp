@@ -17,7 +17,7 @@ L++ is a programming language that transcompiles to C++. It uses Lisp-like synta
 
 `(def a 3 b 4.0 ...)` => `auto a = 3; auto b = 4.0; ...`
 
-`(decl char s[10] "")` => `char s[10]=""` ; declares a variable
+`(decl char |s[10]| "")` => `char s[10]=""` ; declares a variable
 
 `(+ A B C ...)` => `(A + B + C + ...)` (`+ - * / << >>`)
 
