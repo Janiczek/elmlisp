@@ -71,6 +71,8 @@ L++ is a programming language that transcompiles to C++. It uses Lisp-like synta
 
 `(F ARG ...)` => `F(ARG, ...)`
 
+`|CODE|` => `CODE` as-is
+
 See [the source code](https://bitbucket.org/ktg/l/src) for details.
 
 ### Comments ###

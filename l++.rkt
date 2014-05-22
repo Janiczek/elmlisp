@@ -4,7 +4,7 @@
 ; (C) 2014 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.3.2")
+(define version "0.3.3")
 (define (readline)
   (read-line (current-input-port) 'any))
 
@@ -105,7 +105,8 @@
                  [(format) (apply format (second e) (map compile-expr (drop e 2)))]
                  ; (F ARG ...) => F(ARG, ...)
                  [else (format "~a(~a)" (compile-expr f) (string-join (map compile-expr (drop e 1)) ","))])))]
-        [else (~s e)]))
+        ; |CODE| => CODE as-is
+        [else ((if (string? e) ~s ~a) e)]))
 
 (define prolog "#include <iostream>\n")
 (define compiled (~a prolog (string-join (map compile-expr parsed) ";\n" #:after-last ";\n")))
