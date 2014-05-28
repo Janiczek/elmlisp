@@ -8,12 +8,7 @@
   
 (displayln (format "L++ Compiler ~a (C) 2014 KIM Taegyoon" version))
 (displayln "Enter code (EOF when done):")
-(define code "")
-(let loop ()
-  (define line (read-line))
-  (unless (eof-object? line)
-    (set! code (string-append code line "\n"))
-    (loop)))
+(define code (port->string))
 
 (set! code (string-append "(" code ")"))
 
