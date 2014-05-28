@@ -5,14 +5,12 @@
 (require compatibility/defmacro)
 
 (define version "0.3.3")
-(define (readline)
-  (read-line (current-input-port) 'any))
-
+  
 (displayln (format "L++ Compiler ~a (C) 2014 KIM Taegyoon" version))
 (displayln "Enter code (EOF when done):")
 (define code "")
 (let loop ()
-  (define line (readline))
+  (define line (read-line))
   (unless (eof-object? line)
     (set! code (string-append code line "\n"))
     (loop)))
