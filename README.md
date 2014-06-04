@@ -4,6 +4,22 @@
 
 L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
 
+## Usage ##
+```
+#!sh
+
+$ racket l++.rkt -h
+l++.rkt [ <option> ... ] [<filenames>] ...
+ where <option> is one of
+  -c, --compile : Compile only; do not run
+  -v, --verbose : Display verbose messages
+  -o <file> : Place the output into <file>
+  --help, -h : Show this help
+  -- : Do not treat any remaining argument as a switch (at this level)
+ Multiple single-letter switches can be combined after one `-'; for
+  example: `-h-' is the same as `-h --'
+```
+
 ## Syntax and semantics ##
 `(define-syntax ...)` ; defines a macro
 
@@ -97,20 +113,9 @@ Macros are supported via [Racket's macro system](http://docs.racket-lang.org/gui
 Run with
 
 ```
-#!c++
+#!sh
 
-$ racket l++.rkt < ex/hello.lpp
-L++ Compiler (Version) (C) 2014 KIM Taegyoon
-Enter code (EOF when done):
-Compiled:
-#include <iostream>
-int main(int argc, char **argv) {
-std::cout << "Hello, World!" << std::endl;
-return 0;};
-
-Current directory: /Users/phoniz/w/playground/l++/l/
-Output written to: a-out.cpp
-Binary written to: a-out
+$ racket l++.rkt ex/hello.lpp
 Hello, World!
 ```
 

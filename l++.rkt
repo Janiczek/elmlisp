@@ -4,11 +4,31 @@
 ; (C) 2014 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.3.3")
-  
-(displayln (format "L++ Compiler ~a (C) 2014 KIM Taegyoon" version))
-(displayln "Enter code (EOF when done):")
-(define code (port->string))
+(define version "0.4")
+
+(define arg-compile-only (make-parameter #f))
+(define arg-verbose (make-parameter #f))
+(define arg-out-filename (make-parameter "a-out"))
+(define arg-filenames
+  (command-line
+   #:once-each
+   (("-c" "--compile") "Compile only; do not run"
+                       (arg-compile-only #t))
+   (("-v" "--verbose") "Display verbose messages"
+                       (arg-verbose #t))
+   (("-o") file
+           "Place the output into <file>"
+           (arg-out-filename file))
+   #:args filenames
+   filenames))
+
+(define code (void))
+(cond [(empty? arg-filenames)
+       (displayln (format "L++ Compiler ~a (C) 2014 KIM Taegyoon" version))
+       (displayln "Enter code (EOF when done):")
+       (set! code (port->string))]
+      [else
+       (set! code (string-join (for/list ([f arg-filenames]) (file->string f))))])
 
 (set! code (string-append "(" code ")"))
 
@@ -16,7 +36,7 @@
 ;(displayln code)
 (define parsed (read (open-input-string code)))
 ;(displayln "Parsed:")
-;(write parsed) (newline)
+;(displayln parsed)
 
 (define-namespace-anchor anc)
 (define ns (namespace-anchor->namespace anc))
@@ -103,18 +123,22 @@
 
 (define prolog "#include <iostream>\n")
 (define compiled (~a prolog (string-join (map compile-expr parsed) ";\n" #:after-last ";\n")))
-(displayln "Compiled:")
-(displayln compiled)
-(define outsrc "a-out.cpp")
-(define outbin "a-out")
+(when (arg-verbose)
+  (displayln "Compiled:")
+  (displayln compiled))
+(define outsrc (~a (arg-out-filename) ".cpp"))
+(define outbin (arg-out-filename))
 (define out (open-output-file outsrc #:exists 'replace))
 (displayln compiled out)
 (close-output-port out)
 (define dir (current-directory))
-(displayln (format "Current directory: ~a" dir))
-(displayln (format "Output written to: ~a" outsrc))
+(when (arg-verbose)
+  (displayln (format "Current directory: ~a" dir))
+  (displayln (format "Output written to: ~a" outsrc)))
 (when (if (equal? (system-type) 'macosx)
           (system (format "c++ -std=c++11 -O3 -o ~a ~a" outbin outsrc))
           (system (format "c++ -std=c++11 -O3 -s -static -o ~a ~a" outbin outsrc)))
-  (displayln (format "Binary written to: ~a" outbin))
-  (void (system (format "~a~a" dir outbin))))
+  (when (arg-verbose)
+    (displayln (format "Binary written to: ~a" outbin)))
+  (unless (arg-compile-only)
+    (void (system (format "~a~a" dir outbin)))))
