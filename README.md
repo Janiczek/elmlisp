@@ -87,6 +87,8 @@ l++.rkt [ <option> ... ] [<filenames>] ...
 
 `(F ARG ...)` => `F(ARG, ...)`
 
+`#\a` => `'a'`
+
 `|CODE|` => `CODE` as-is
 
 See [the source code](https://bitbucket.org/ktg/l/src) for details.

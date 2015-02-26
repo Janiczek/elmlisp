@@ -4,7 +4,7 @@
 ; (C) 2014 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.4")
+(define version "0.4.1")
 
 (define arg-compile-only (make-parameter #f))
 (define arg-verbose (make-parameter #f))
@@ -118,6 +118,8 @@
                  [(format) (apply format (second e) (map compile-expr (drop e 2)))]
                  ; (F ARG ...) => F(ARG, ...)
                  [else (format "~a(~a)" (compile-expr f) (string-join (map compile-expr (drop e 1)) ","))])))]
+        ; #\a => 'a'
+        [(char? e) (format "'~a'" e)]
         ; |CODE| => CODE as-is
         [else ((if (string? e) ~s ~a) e)]))
 
