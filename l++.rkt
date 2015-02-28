@@ -118,7 +118,7 @@
                  [(format) (apply format (second e) (map compile-expr (drop e 2)))]
                  ; (F ARG ...) => F(ARG, ...)
                  [else (format "~a(~a)" (compile-expr f) (string-join (map compile-expr (drop e 1)) ","))])))]
-        ; #\a => 'a'
+        ; #\A => 'A'
         [(char? e) (format "'~a'" e)]
         ; |CODE| => CODE as-is
         [else ((if (string? e) ~s ~a) e)]))

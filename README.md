@@ -87,7 +87,7 @@ l++.rkt [ <option> ... ] [<filenames>] ...
 
 `(F ARG ...)` => `F(ARG, ...)`
 
-`#\a` => `'a'`
+`#\A` => `'A'`
 
 `|CODE|` => `CODE` as-is
 
