@@ -1,10 +1,10 @@
 #lang racket
 ; The L++ Programming Language
 ; L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
-; (C) 2014 KIM Taegyoon
+; (C) 2014-2015 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.4.2")
+(define version "0.4.3")
 
 (define arg-compile-only (make-parameter #f))
 (define arg-verbose (make-parameter #f))
@@ -90,8 +90,10 @@
                  [(do) (format "{~a;}" (string-join (map compile-expr (rest e)) ";\n"))]
                  ; (do/e EXPR ...) => (EXPR, ...)
                  [(do/e) (string-join (map compile-expr (rest e)) "," #:before-first "(" #:after-last ")")]
-                 ; (at ARRAY POSITION) => ARRAY[POSITION]
-                 [(at) (format "~a[~a]" (compile-expr (second e)) (compile-expr (third e)))]
+                 ; (at ARRAY [POSITION]) => ARRAY[[POSITION]]
+                 [(at) (format "~a[~a]" (compile-expr (second e))
+                               (if (= (length e) 3) (compile-expr (third e))
+                                   ""))]
                  ; (break) => break
                  [(break continue) (~a f)]
                  ; (main BODY ...) => int main(int argc, char **argv) {BODY; ...; return 0;}

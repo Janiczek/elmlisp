@@ -59,7 +59,7 @@ l++.rkt [ <option> ... ] [<filenames>] ...
 
 `(do/e EXPR ...)` => `(EXPR, ...)`
 
-`(at ARRAY POSITION)` => `ARRAY[POSITION]`
+`(at ARRAY [POSITION])` => `ARRAY[[POSITION]]`
 
 `(break)` => `break` (`break continue`)
 
