@@ -24,7 +24,7 @@
 
 (define code (void))
 (cond [(empty? arg-filenames)
-       (displayln (format "L++ Compiler ~a (C) 2014 KIM Taegyoon" version))
+       (displayln (format "L++ Compiler ~a (C) 2014-2015 KIM Taegyoon" version))
        (displayln "Enter code (EOF when done):")
        (set! code (port->string))]
       [else

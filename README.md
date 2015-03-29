@@ -1,6 +1,6 @@
 # L++: The L++ Programming Language #
 
-(C) 2014 Kim, Taegyoon
+(C) 2014-2015 Kim, Taegyoon
 
 L++ is a programming language that transcompiles to C++. It uses Lisp-like syntax.
 
@@ -137,7 +137,7 @@ Other examples are in the [`ex` directory](https://bitbucket.org/ktg/l/src).
 
 ## License ##
 
-   Copyright 2014 Kim, Taegyoon
+   Copyright 2014-2015 Kim, Taegyoon
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
