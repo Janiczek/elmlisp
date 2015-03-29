@@ -33,7 +33,7 @@ l++.rkt [ <option> ... ] [<filenames>] ...
 
 `(def a 3 b 4.0 ...)` => `auto a = 3; auto b = 4.0; ...`
 
-`(decl char |s[10]| "")` => `char s[10]=""` ; declares a variable
+`(decl TYPE VAR [VAL])` => `TYPE VAR[=VAL]` ; declares a variable
 
 `(+ A B C ...)` => `(A + B + C + ...)` (`+ - * / << >>`)
 

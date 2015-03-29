@@ -4,7 +4,7 @@
 ; (C) 2014 KIM Taegyoon
 (require compatibility/defmacro)
 
-(define version "0.4.1")
+(define version "0.4.2")
 
 (define arg-compile-only (make-parameter #f))
 (define arg-verbose (make-parameter #f))
@@ -63,8 +63,8 @@
                  [(defn) (format "~a ~a(~a) {\n~a;}\n" (list-ref e 1) (list-ref e 2) (let [(args (fourth e))] (string-join (for/list ([i (in-range 0 (length args) 2)]) (format "~a ~a" (list-ref args i) (list-ref args (add1 i)))) ",")) (string-join (map compile-expr (drop e 4)) ";\n"))]
                  ; (def a 3 b 4.0 ...) => auto a = 3; auto b = 4.0; ...
                  [(def) (string-join (for/list ([i (in-range 1 (length e) 2)]) (format "auto ~a=~a" (list-ref e i) (compile-expr (list-ref e (add1 i))))) ";\n")]
-                 ; (decl char |s[10]| "") => char s[10]="" ; declares a variable
-                 [(decl) (~a (second e) " " (third e) (if (<= (length e) 3) "" (~a "=" (compile-expr (fourth e)))))]
+                 ; (decl TYPE VAR [VAL]) => TYPE VAR[=VAL] ; declares a variable
+                 [(decl) (~a (second e) " " (compile-expr (third e)) (if (<= (length e) 3) "" (~a "=" (compile-expr (fourth e)))))]
                  ; (+ A B C ...) => (A + B + C + ...)
                  [(+ - * / << >>) (string-join (map compile-expr (rest e)) (~a f) #:before-first "(" #:after-last ")")]
                  ; (++ A) => (++ A) ; unary operators
