@@ -83,13 +83,13 @@ l++.rkt [ <option> ... ] [<filenames>] ...
 
 `(code "CODE")` => `CODE` as-is
 
+`|CODE|` => `CODE` as-is
+
 `(format form ...)` ; compile-time formatting
 
 `(F ARG ...)` => `F(ARG, ...)`
 
 `#\A` => `'A'`
-
-`|CODE|` => `CODE` as-is
 
 See [the source code](https://bitbucket.org/ktg/l/src) for details.
 
