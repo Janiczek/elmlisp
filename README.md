@@ -35,11 +35,11 @@ l++.rkt [ <option> ... ] [<filenames>] ...
 
 `(decl TYPE VAR [VAL])` => `TYPE VAR[=VAL]` ; declares a variable
 
-`(+ A B C ...)` => `(A + B + C + ...)` (`+ - * / << >>`)
+`(+ A B C ...)` => `(A + B + C + ...)` (`+ - * / << >> =`)
 
 `(++ A)` => `(++ A)` ; unary operators (`++ -- not compl`)
 
-`(< A B)` => `(A < B)` ; binary operators (`< <= > >= == != % = += -= *= /= %= and and_eq bitand bitor not_eq or or_eq xor xor_eq`)
+`(< A B)` => `(A < B)` ; binary operators (`< <= > >= == != % += -= *= /= %= and and_eq bitand bitor not_eq or or_eq xor xor_eq`)
 
 `(return A)` => `return A`
 

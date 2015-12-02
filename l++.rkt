@@ -66,11 +66,11 @@
                  ; (decl TYPE VAR [VAL]) => TYPE VAR[=VAL] ; declares a variable
                  [(decl) (~a (second e) " " (compile-expr (third e)) (if (<= (length e) 3) "" (~a "=" (compile-expr (fourth e)))))]
                  ; (+ A B C ...) => (A + B + C + ...)
-                 [(+ - * / << >>) (string-join (map compile-expr (rest e)) (~a f) #:before-first "(" #:after-last ")")]
+                 [(+ - * / << >> =) (string-join (map compile-expr (rest e)) (~a f) #:before-first "(" #:after-last ")")]
                  ; (++ A) => (++ A) ; unary operators
                  [(++ -- not compl) (format "(~a ~a)" f (compile-expr (second e)))]
                  ; (< A B) => (A < B) ; binary operators
-                 [(< <= > >= == != % = += -= *= /= %= and and_eq bitand bitor not_eq or or_eq xor xor_eq) (format "(~a ~a ~a)" (compile-expr (second e)) f (compile-expr (third e)))]
+                 [(< <= > >= == != % += -= *= /= %= and and_eq bitand bitor not_eq or or_eq xor xor_eq) (format "(~a ~a ~a)" (compile-expr (second e)) f (compile-expr (third e)))]
                  ; (return A) => return A
                  [(return) (format "return ~a" (compile-expr (second e)))]
                  ; (? TEST THEN ELSE) => (TEST ? THEN : ELSE)
