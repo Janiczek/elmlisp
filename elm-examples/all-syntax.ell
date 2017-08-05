@@ -1,0 +1,35 @@
+; colons are optional (whitespace)
+
+(module Foo exposing (bar baz))
+(module Bar exposing (baz, foo))
+(module Nested.Bar exposing (..))
+(module Baz exposing ((Msg (..))))
+(module Nasty exposing ((Msg (..)), Model))
+
+(import Html)
+(import Random exposing (..))
+(import Set exposing ((Msg (..))))
+(import Json.Decode as JD)
+(import Json.Encode as JE exposing (value string))
+
+(type-alias Model Int)
+(type-alias User
+  {name String,
+   age Int})
+(type-alias MyHtml (Html Int))
+(type-alias MyCmd (Cmd (List String)))
+(type-alias (Param a) (Html (List a)))
+
+(type Bool
+  True
+  False)
+
+(type (Maybe a)
+  Nothing
+  (Just a))
+  
+(type Msg
+  NoOp
+  Increment
+  (DecrementBy Int)
+  (SetName String))
