@@ -56,9 +56,12 @@
                  ; (module Nested.Bar exposing (..)) => module Nested.Bar exposing (..)
                  ; (module Baz exposing ((Msg (..))) => module Baz exposing (Msg(..))
                  [(module)
-                  (format "module ~a exposing (~a)"
-                          (second e)
-                          (format-exposing (fourth e)))]
+                  (format-module e "module")]
+
+                 [(port-module)
+                  (format-module e "port module")]
+
+                 ; TODO effect module
 
                  ; (import Foo)                      => import Foo
                  ; (import Foo as F)                 => import Foo as F
@@ -94,7 +97,7 @@
                  ; (type-alias MyCmd (Cmd (List String)))    => type alias MyCmd = Cmd (List String)
                  ; (type-alias (Param a) (Html (List a)))    => type alias Param a = Html (List a)
                  [(type-alias)
-                  (format "type alias ~a = ~a"
+                  (format "type alias ~a =\n    ~a"
                           (format-type (second e))
                           (format-type (third e)))]
 
@@ -102,9 +105,63 @@
                  ; (type (Maybe a) Nothing (Just a)) => type Maybe a = Nothing | Just a
                  ; (type Msg Inc (DecBy Int))        => type Msg = Inc | DecBy Int
                  [(type)
-                  (format "type ~a = ~a"
+                  (format "type ~a\n    = ~a"
                           (format-type (second e))
-                          (third e))])))]
+                          (format-type-definition (list-tail e 2)))]
+
+                 ; (input-port sendToJs String) => port sendToJs : String -> Cmd msg
+                 [(input-port)
+                  (format "port ~a : ~a -> Cmd msg"
+                          (second e)
+                          (format-type (third e)))]
+                 
+                 ; (output-port listen Bool) => port listen : (Bool -> msg) -> Sub msg
+                 [(output-port)
+                  (format "port ~a : (~a -> msg) -> Sub msg"
+                          (second e)
+                          (format-type (third e)))]
+
+                 ; (lambda x (+ x 1))     => \x -> x + 1
+                 ; (lambda (x y) (+ x y)) => \x y -> x + y
+                 [(lambda)
+                  (format "\\~a -> ~a"
+                          (format-arguments (second e))
+                          (compile (third e)))]
+
+                 ; (def val 1)       => x = 1
+                 ; (def val : Int 1) => x : Int \n x = 1
+                 [(def)
+                  (case (length e)
+                    [(3)
+                     (format "~a =\n    ~a"
+                             (second e)
+                             (third e))]
+
+                    [(5)
+                     (format "~a : ~a\n~a =\n    ~a"
+                             (second e)
+                             (format-type (fourth e))
+                             (second e)
+                             (compile (fifth e)))])]
+
+                 ; (if True "a" "b") => if True then "a" else "b"
+                 [(if)
+                  (format "if ~a then ~a else ~a"
+                          (compile (second e))
+                          (compile (third e))
+                          (compile (fourth e)))]
+
+                 ; (case msg (Inc 1) ((IncBy amount) amount)) => case msg of Inc -> 1 \n IncBy amount -> amount
+                 ;[(case)
+                 ; (format "case ~a of\n~a"
+                 ;         (compile (second e))
+                 ;         (format-cases))]
+
+                 ; anything else -> show as is
+                 [else ((if (string? e)
+                            ~s
+                            ~a)
+                        e)])))]
 
                  ; TODO maybe the deleted C++ stuff will still be useful
                  ; https://bitbucket.org/ktg/l/src/57a5293aa0f040c81afd799364f3aaacaf8676fa/l++.rkt?at=master&fileviewer=file-view-default#l%2B%2B.rkt-60:122

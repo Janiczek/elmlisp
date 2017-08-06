@@ -8,11 +8,11 @@
 
 ; TODO temporary crutch - when ready, put back the stdin/file behaviour
 ; https://bitbucket.org/ktg/l/src/57a5293aa0f040c81afd799364f3aaacaf8676fa/l++.rkt?at=master&fileviewer=file-view-default#l%2B%2B.rkt-26:31
-(define code
+(define file-contents
   (file->string "elm-examples/all-syntax.ell"))
 
 ; wrap it all into one list
-(set! code (string-append "(" code ")"))
+(define code (string-append "(" file-contents ")"))
 
 ; parse the string into Racket forms
 ; (with a few exceptions given by the readtable)
@@ -24,7 +24,7 @@
 (define compiled
   (~a (string-join
        (map compile parsed)
-       "\n"
+       "\n\n"
        #:after-last "\n")))
 
 ; TODO when ready, delete this and put back the "write to a file" behaviour
