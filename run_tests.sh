@@ -8,6 +8,7 @@ DIM="\e[2m";
 RED="\e[31m";
 GREEN="\e[32m";
 HOME="\e[2K\e[200D";
+UP="\e[1A";
 
 function redraw_and_run {
   clear;
@@ -28,17 +29,18 @@ function run {
   for INPUT in ${TEST_INPUTS}; do
     ((CURRENT_TEST++))
     TEST_NAME=$(basename ${INPUT} .in);
-    echo -en "${HOME}${CURRENT_TEST}/${NUMBER_OF_TESTS}: ${TEST_NAME}";
+    echo -e "${HOME}${CURRENT_TEST}/${NUMBER_OF_TESTS}: ${TEST_NAME}";
     racket src/elmlisp.rkt ${INPUT} >${TMP_OUTPUT};
     WANTED_OUTPUT="tests/${TEST_NAME}.out";
     if ! colordiff -B ${TMP_OUTPUT} ${WANTED_OUTPUT}; then
       ALL_TESTS_PASSED=false;
       break;
     fi;
+    echo -en "${UP}"
   done;
   
-  rm -f tmp.out;
-  echo -en "${HOME}"
+  rm -f ${TMP_OUTPUT};
+  echo -en "${HOME}";
   
   if [ "${ALL_TESTS_PASSED}" = true ]; then
     echo -e "${GREEN}All tests passed!${COLOR_OFF}";
