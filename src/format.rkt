@@ -45,19 +45,37 @@
 
 ; used for all kinds of type annotations
 ; basically remove outermost parens but otherwise leave as is
+; with exception of (->)
 ; --------------------------------
 ; TODO: what about records? will have to special-case here
 ; (elm-record (name String) (age Int))
 ; =>
 ; { name : String , age : Int }
 ; --------------------------------
-; String          => String
-; (Html Msg)      => Html Msg
-; (Html (List a)) => Html (List a)
-(define (format-type type)
-  (if (list? type)
-    (string-join (map ~a type) " ")
-    (~a type)))
+; String            => String
+; (Html Msg)        => Html Msg
+; (Html (List a))   => Html (List a)
+; (-> Int String)   => Int -> String
+; (-> Int (List a)) => Int -> List a
+; (-> (-> a b) a b) => (a -> b) -> a -> b
+(define (format-type type #:nested? [nested? #f])
+  (cond
+    [(is-arrow-type? type)
+     (if nested?
+       (wrap-in-parens (format-arrow-type type))
+       (format-arrow-type type))]
+
+    [(list? type)
+     (string-join (map ~a type) " ")]
+
+    [else
+      (~a type)]))
+
+(define (format-arrow-type type)
+  (string-join (map (lambda (type-part)
+                      (format-type type-part #:nested? #t))
+                    (rest type))
+               " -> "))
 
 ; allows module, port module
 ; --------------------------

@@ -1,0 +1,4 @@
+(defn map : (-> (-> a b) a b)
+  (fn val)
+  "also lying!")
+

@@ -1,0 +1,3 @@
+(defn foo : (-> Int String)
+  (bar)
+  "haha")

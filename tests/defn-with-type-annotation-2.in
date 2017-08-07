@@ -1,0 +1,3 @@
+(defn foo : (-> Int (List a))
+  (bar)
+  "lying!")

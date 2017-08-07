@@ -51,6 +51,7 @@
         [(output-port) (compile-output-port e)]
         [(lambda)      (compile-lambda e)]
         [(def)         (compile-def e)]
+        [(defn)        (compile-defn e)]
         [(if)          (compile-if e)]
         [(case)        (compile-case e)]
 
@@ -159,6 +160,22 @@
                    (format-type type)
                    name
                    (compile-expr definition))]))
+
+(define (compile-defn expr)
+  (match expr
+         [`(defn ,name ,arguments ,body)
+           (format "~a ~a =\n    ~a"
+                   name
+                   (format-arguments arguments)
+                   (compile-expr body))]
+
+         [`(defn ,name : ,type ,arguments ,body)
+           (format "~a : ~a\n~a ~a =\n    ~a"
+                   name
+                   (format-type type)
+                   name
+                   (format-arguments arguments)
+                   (compile-expr body))]))
 
 (define (compile-if expr)
   (match expr

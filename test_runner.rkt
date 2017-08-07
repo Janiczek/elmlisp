@@ -22,16 +22,19 @@
                    (map (lambda (file)
                           (string-trim file ".in" #:right? #t)))))
 
+(define (trim string)
+  (string-trim string #:repeat? #t))
+
 (for ([test tests])
-  (when (not (member (format "~a.out" test) test-files))
-    (raise-user-error (red (format "ERROR: Test '~a' doesn't have an output file." test))))
-  (let* ([input           (file->string (format "~a/~a.in"  test-directory test))]
-         [expected-output (file->string (format "~a/~a.out" test-directory test))]
-         [actual-output   (compile input)])
-    (when (not (equal? expected-output actual-output))
-      (raise-user-error (red (format "FAILURE: Test '~a' didn't pass:\n\nExpected:\n~a\nActual:\n~a"
-                                     test
-                                     expected-output
-                                     actual-output))))))
+     (when (not (member (format "~a.out" test) test-files))
+       (raise-user-error (red (format "ERROR: Test '~a' doesn't have an output file." test))))
+     (let* ([input           (file->string (format "~a/~a.in"  test-directory test))]
+            [expected-output (trim (file->string (format "~a/~a.out" test-directory test)))]
+            [actual-output   (trim (compile input))])
+       (when (not (equal? expected-output actual-output))
+         (raise-user-error (red (format "FAILURE: Test '~a' didn't pass:\n\nExpected:\n~a\n\nActual:\n~a\n"
+                                        test
+                                        expected-output
+                                        actual-output))))))
 
 (displayln (green "All tests passed."))

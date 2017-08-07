@@ -1,0 +1,3 @@
+foo : Int -> List a
+foo bar =
+    "lying!"

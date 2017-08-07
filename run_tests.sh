@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+ERRORS_FILE="errors.txt";
+
 COLOR_OFF="\e[0m";
+RED="\e[31m";
 DIM="\e[2m";
 
 function compile {
   echo "Sources changed, recompiling!";
-  raco exe test_runner.rkt;
+  raco exe test_runner.rkt &>${ERRORS_FILE};
 }
 
 function redraw_and_run {
@@ -18,21 +21,37 @@ function redraw_and_run {
   ./test_runner;
 }
 
+function show_compiler_errors {
+  echo -e "${RED}\nErrors:\n${COLOR_OFF}$(cat ${ERRORS_FILE})\n";
+}
+
 if [ ! -f test_runner ]; then
   compile;
 fi;
 
-redraw_and_run;
+if [[ -z $(cat ${ERRORS_FILE}) ]]; then
+  redraw_and_run;
+else
+  show_compiler_errors;
+fi;
 
-inotifywait -mqr -e close_write,move,create,delete --format '%w %e %f' ./tests ./src @compiled | while read DIR EVENT FILE; do
+rm -f ${ERRORS_FILE};
 
-  # echo "${EVENT} ${DIR} ${FILE}" >>events.txt # debugging for why it recompiles twice in a row
+inotifywait -mqr -e close_write,move,create,delete --format '%w %e %f' ./tests ./src ./test_runner.rkt @compiled | while read DIR EVENT FILE; do
 
-  if [ "${DIR}" == "./src/" ]; then
+  #echo "event: ${EVENT} // dir: ${DIR} // file: ${FILE}" >>events.txt # debugging
+
+  if [ "${DIR}" == "./src/" ] || [ "${DIR}" == "./test_runner.rkt" ]; then
     compile;
   fi;
 
-  redraw_and_run;
+  if [[ -z $(cat ${ERRORS_FILE}) ]]; then
+    redraw_and_run;
+  else
+    echo -e "${RED}\nErrors:\n${COLOR_OFF}$(cat ${ERRORS_FILE})\n";
+  fi;
+
+  rm -f ${ERRORS_FILE};
 
 done;
 
