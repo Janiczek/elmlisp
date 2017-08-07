@@ -9,6 +9,8 @@
          format-arguments)
          ;format-cases
 
+(require "helpers.rkt")
+
 ; when reading a file, wrap all its s-exprs into one list
 (define (wrap-in-parens string)
  (string-append "(" string ")"))
@@ -29,15 +31,17 @@
 ; ((Msg (..)))  => Msg(..)
 (define (format-exposing list)
   (string-join
-    ; could be (map ~a list) but we are special-casing for Msg(..)
     (map (lambda (exposed)
-           (if (and (list? exposed)
-                    (equal? (second exposed)
-                            '(..)))
-             (format "~a(..)" (first exposed))
-             (~a exposed)))       
+           (if (is-exposed-adt? exposed)
+               (format-exposed-adt exposed)
+               (~a exposed)))       
          list)
     ", "))
+
+(define (format-exposed-adt adt)
+  (format "~a(~a)"
+          (first adt)
+          (string-join (map ~a (second adt)) ", ")))
 
 ; used for all kinds of type annotations
 ; basically remove outermost parens but otherwise leave as is
