@@ -1,31 +1,26 @@
 #lang racket
 
-; TODO: all 'module' to the top
-; TODO: all 'import' to the top
+; TODO: all 'module' definitions to the top, from whenever user or macro calls (module)
+; TODO: all 'import' to the top, alphabetically sorted
 
-(require "readtable.rkt"
-         "compile.rkt")
+; TODO: optionally use elm-format on the resulting file(s)?
 
-; TODO temporary crutch - when ready, put back the stdin/file behaviour
+(require "parse.rkt"
+         "compile.rkt"
+         "format.rkt")
+
+; 1. read the file contents (TODO: allow reading from STDIN, and multiple files)
 ; https://bitbucket.org/ktg/l/src/57a5293aa0f040c81afd799364f3aaacaf8676fa/l++.rkt?at=master&fileviewer=file-view-default#l%2B%2B.rkt-26:31
-(define file-contents
-  (file->string "elm-examples/all-syntax.ell"))
+(define file-contents (file->string "elm-examples/all-syntax.ell"))
 
-; wrap it all into one list
-(define code (string-append "(" file-contents ")"))
+; 2. wrap it into ( parentheses ) so that we can map over all the expressions
+(define code (wrap-in-parens file-contents))
 
-; parse the string into Racket forms
-; (with a few exceptions given by the readtable)
-(define parsed
-  (parameterize ([current-readtable (elmlisp-readtable)])
-    (read (open-input-string code))))
+; 3. parse the string into s-expressions
+(define parsed (parse code))
 
-; compile into Elm source code
-(define compiled
-  (~a (string-join
-       (map compile parsed)
-       "\n\n"
-       #:after-last "\n")))
+; 4. compile s-expressions into Elm source code string (running macros in the process)
+(define compiled (format-compiled-code (map compile parsed)))
 
-; TODO when ready, delete this and put back the "write to a file" behaviour
+; 5. display the result (TODO: allow writing to a file / more files)
 (displayln compiled)

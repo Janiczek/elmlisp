@@ -19,7 +19,7 @@
 (define-namespace-anchor anc)
 
 (define ns
-  (namespace-anchor->namespace anc))
+ (namespace-anchor->namespace anc))
 
 (define (macroexpand-1 lst)
   (syntax->datum
@@ -52,6 +52,7 @@
                   (eval e ns)
                   ""]
 
+                 ; (module Main)                     => module Main exposing (..)
                  ; (module Foo exposing (main view)) => module Foo exposing (main, view)
                  ; (module Nested.Bar exposing (..)) => module Nested.Bar exposing (..)
                  ; (module Baz exposing ((Msg (..))) => module Baz exposing (Msg(..))

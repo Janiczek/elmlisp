@@ -1,5 +1,6 @@
 ; colons are optional (whitespace)
 
+(module Main) ; implicit exposing (..)
 (module Foo exposing (bar baz))
 (module Bar exposing (baz, foo))
 (module Nested.Bar exposing (..))
@@ -60,30 +61,25 @@ and look, it's multiline!|
   (Increment 1)
   ((DecrementBy amount) (- amount)))
 
-; TODO (effect-module) ; otherwise the same as (module) ?? read up on it :)
+; TODO comments
 
-; TODO {name String, age Int} => (elm-record name String age Int) ; => { name : String, age : Int }
-; TODO {name "a", age 1}      => (elm-record name "a" age 1)      ; => { name = "a", age = 1 }
-; will have to format elm-record differently in types and in values!
+; TODO (effect-module) ; otherwise the same as (module) ?? read up on it :) maybe a nice macro will be possible for effect managers
 
-; TODO [1 2 3]  => (elm-list 1 2 3)  => [1, 2, 3]
-; TODO #[1 "a"] => (elm-tuple 1 "a") => (1, "a")
+; TODO {name String, age Int} => (elm-record name String age Int) => { name : String, age : Int }
+; TODO {name "a", age 1}      => (elm-record name "a" age 1)      => { name = "a", age = 1 }
+; TODO [1 2 3]                => (elm-list 1 2 3)                 => [1, 2, 3]
+; TODO #[1 "a"]               => (elm-tuple 1 "a")                => (1, "a")
 
-; TODO SPECIFY TODOS :)
-; --------------------------
 ; TODO (defn
 ; TODO (defn : type
 ; TODO (let
 ; TODO (case
+; TODO (case wildcard
 ; TODO binary ops
 
 ; TODO macro for specifying things as binary ops
-
 ; TODO argument destructuring?
 ; TODO arg destructuring - ADTs with only one constructor?
-
 ; TODO try creating a "where" alternative for "let" ?
-
 ; TODO how will #t #f vs True False play out for macros?
-
 ; TODO operators both unary and binary? (-)
