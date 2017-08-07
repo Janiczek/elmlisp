@@ -65,7 +65,7 @@ $ elmlisp input.ell
 
 ### Download:
 
-- [v0.0.3 (Linux 64bit)](https://raw.githubusercontent.com/Janiczek/elmlisp/0.0.3/dist/elmlisp)
+- [v0.0.4 (Linux 64bit)](https://raw.githubusercontent.com/Janiczek/elmlisp/0.0.4/dist/elmlisp)
 
 ### Compiling from source (also requires Racket!):
 
