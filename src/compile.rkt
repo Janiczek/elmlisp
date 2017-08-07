@@ -8,18 +8,27 @@
 ; currently:
 ; => type alias User = name String age Int
 
-; This can be done by reading {...} into (elm-record ...) and then having  case for that in (compile)
+; This can be done by reading {...} into (elm-record ...) and then having  case for that in (compile-expr
 
-(require "format.rkt")
+(require threading
+         "format.rkt"
+         "parse.rkt")
 
 (provide compile)
+
+(define (compile file-contents)
+  (~>> file-contents
+       (wrap-in-parens)
+       (parse)
+       (map compile-expr)
+       (format-compiled-code)))
 
 ; ----------------------------------
 ; Racket-y macro magic.
 (define-namespace-anchor anc)
 
 (define ns
- (namespace-anchor->namespace anc))
+  (namespace-anchor->namespace anc))
 
 (define (macroexpand-1 lst)
   (syntax->datum
@@ -30,10 +39,10 @@
 ; ----------------------------------
 
 ; This is where we emit Elm code.
-(define (compile e)
+(define (compile-expr e)
   (cond [(and (list? e) (not (empty? e)))
          (if (set-member? macros (first e))
-             (compile (macroexpand-1 e)) ; run macros first, then generate Elm code!
+             (compile-expr (macroexpand-1 e)) ; run macros first, then generate Elm code!
              (let ([f (first e)])
                (case f
 
@@ -93,7 +102,7 @@
                              (format-exposing (sixth e)))])]
 
                  ; (type-alias Model Int)                    => type alias Model = Int
-                 ; (type-alias User { name String, age Int } => type alias User = { name : String, age : Int }
+                 ; TODO: (type-alias User { name String, age Int } => type alias User = { name : String, age : Int }
                  ; (type-alias MyHtml (Html Int))            => type alias MyHtml = Html Int
                  ; (type-alias MyCmd (Cmd (List String)))    => type alias MyCmd = Cmd (List String)
                  ; (type-alias (Param a) (Html (List a)))    => type alias Param a = Html (List a)
@@ -127,7 +136,7 @@
                  [(lambda)
                   (format "\\~a -> ~a"
                           (format-arguments (second e))
-                          (compile (third e)))]
+                          (compile-expr (third e)))]
 
                  ; (def val 1)       => x = 1
                  ; (def val : Int 1) => x : Int \n x = 1
@@ -143,19 +152,19 @@
                              (second e)
                              (format-type (fourth e))
                              (second e)
-                             (compile (fifth e)))])]
+                             (compile-expr (fifth e)))])]
 
                  ; (if True "a" "b") => if True then "a" else "b"
                  [(if)
                   (format "if ~a then ~a else ~a"
-                          (compile (second e))
-                          (compile (third e))
-                          (compile (fourth e)))]
+                          (compile-expr (second e))
+                          (compile-expr (third e))
+                          (compile-expr (fourth e)))]
 
                  ; (case msg (Inc 1) ((IncBy amount) amount)) => case msg of Inc -> 1 \n IncBy amount -> amount
                  ;[(case)
                  ; (format "case ~a of\n~a"
-                 ;         (compile (second e))
+                 ;         (compile-expr (second e))
                  ;         (format-cases))]
 
                  ; anything else -> show as is
@@ -164,11 +173,11 @@
                             ~a)
                         e)])))]
 
-                 ; TODO maybe the deleted C++ stuff will still be useful
-                 ; https://bitbucket.org/ktg/l/src/57a5293aa0f040c81afd799364f3aaacaf8676fa/l++.rkt?at=master&fileviewer=file-view-default#l%2B%2B.rkt-60:122
+        ; TODO maybe the deleted C++ stuff will still be useful
+        ; https://bitbucket.org/ktg/l/src/57a5293aa0f040c81afd799364f3aaacaf8676fa/l++.rkt?at=master&fileviewer=file-view-default#l%2B%2B.rkt-60:122
                  
         ; anything else -> show as is
         [else ((if (string? e)
-                 ~s
-                 ~a)
+                   ~s
+                   ~a)
                e)]))

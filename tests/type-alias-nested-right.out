@@ -1,0 +1,2 @@
+type alias H =
+    Html Int

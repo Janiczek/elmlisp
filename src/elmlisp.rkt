@@ -5,11 +5,11 @@
 
 ; TODO: optionally use elm-format on the resulting file(s)?
 
-(require "parse.rkt"
-         "compile.rkt"
-         "format.rkt")
+(require "compile.rkt")
 
-(define version "0.0.1")
+(provide compile)
+
+(define version "0.0.2")
 
 ; 1. read the cmdline arguments (currently we only accept a filename to compile
 (define arguments (current-command-line-arguments))
@@ -27,14 +27,5 @@
     ; read from a file
     (file->string (vector-ref arguments 0))))
 
-; 3. wrap it into ( parentheses ) so that we can map over all the expressions
-(define code (wrap-in-parens file-contents))
-
-; 4. parse the string into s-expressions
-(define parsed (parse code))
-
-; 5. compile s-expressions into Elm source code string (running macros in the process)
-(define compiled (format-compiled-code (map compile parsed)))
-
 ; 6. display the result (TODO: allow writing to a file)
-(displayln compiled)
+(displayln (compile file-contents))
