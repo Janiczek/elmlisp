@@ -1,7 +1,0 @@
-(main
-  (for (def i 0) (< i 5) (++ i)
-    (pr i ": ")
-    (switch i
-      (case 0 1) (prn "0 or 1") (break)
-      (case 2) (prn "2") (break)
-      (default) (prn "other"))))

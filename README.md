@@ -78,29 +78,49 @@ Will create an `elmlisp` binary in your current directory.
 ### Structure of this repo
 
 ```
-- elm-examples/
-    - all-syntax.ell - All possible (implemented and planned) syntax for ElmLisp, this is my
-                       input file when developing...
-
-- run_tests.sh - Test runner.
-- tests/ - Diff tests - input files and expected output files.
-
- 
 - src/
     - elmlisp.rkt - Application entrypoint. Run/compile this file.
     - format.rkt - Helper functions for how to emit Elm source code.
     - parse.rkt - Module concerned with how to read string with ElmLisp source code into s-expressions.
-                  (How to read commas? How to read [] {} #[]? Etc.)
-    - compile.rkt - The meat of the application. Recursively compiles various s-expressions
-                    into Elm source code strings.
+    - compile.rkt - The meat of the application. Compiles s-expressions into Elm source code strings.
+    - helpers.rkt - Various helpers and predicates for the compiler.
+
+- tests/ - Diff tests - input files and expected output files. Look here for examples of ElmLisp!
+
+- run_tests.sh - Test runner watcher (runs test_runner.rkt when src/ or tests/ changes).
+- test_runner.rkt - Script for running the test suite once.
+ 
 ```
 
 ----
 
 ### TODO
 
-- [ ] tests (`lambda.in` -> `lambda.out`, diff with compiler output) for various language constructs
 - [ ] refactoring of `compile.rkt` into helper funtions in `format.rkt` (all the `(format "..." ...)` calls)
+- [ ] Elm records, tuples, lists
+- [ ] `defn` (both with and without type annotations)
+- [ ] examples of macros
+- [ ] `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
+- [ ] `(type-alias)` with records
+- [ ] all the `(module)` definitions rendered at the top (it's technically an error, but the Elm compiler will tell you that)
+- [ ] all the `(import)` definitions rendered at the top, sorted
+- [ ] maybe use `elm-format` on the result? cmd-line option for that?
+- [ ] destructuring in fn arguments
+- [ ] destructuring in fn arguments - what about ADTs with one constructor?
+- [ ] `(case)` both with and without wildcard, and destructuring
+- [ ] `(let)` (with destructuring too)
+- [ ] tests for `|verbatim code|`
+- [ ] tests for `(input-port)`
+- [ ] tests for `(output-port)`
+- [ ] tests for `(lambda)`
+- [ ] tests for `(if)`
+- [ ] tests for `(def)` with and without type annotations
+- [ ] comments
+- [ ] binary ops from base
+- [ ] macro for specifying stuff as binary ops (ElmLisp can't know about library's operators)
+- [ ] how will #t and #f vs True and False play out in macros etc.?
+- [ ] maybe try creating a `(where)` alternative to `(let)` as an macro, if that even makes sense in ElmLisp
+- [ ] operators that are both binary and unary (`-`)
 
 ----
 

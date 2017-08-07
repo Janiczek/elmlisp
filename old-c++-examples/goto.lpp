@@ -1,7 +1,0 @@
-(main
-  (def i 1)
-  (label start)
-  (if (<= i 9) (pr i) (goto end))
-  (++ i)
-  (goto start)
-  (label end))

@@ -1,9 +1,0 @@
-(main
-  (def a 1 b 1 s 0)
-  (while 1
-    (def c (+ a b))
-    (if (> c 4000000) (break))
-    (if (== (% c 2) 0) (+= s c))
-    (= a b)
-    (= b c))
-  (prn s))

@@ -1,9 +1,0 @@
-(include "cstdio")
-
-(main
-  (for (def a 1) (< a 1000) (++ a)
-    (for (def b (+ a 1)) (< b 1000) (++ b)
-      (def c (- 1000 a b))
-      (when (< c 1) (continue))
-      (when (== (+ (* a a) (* b b)) (* c c))
-        (std::printf "%d * %d * %d = %d\n" a b c (* a b c))))))

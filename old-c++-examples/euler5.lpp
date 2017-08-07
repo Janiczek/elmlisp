@@ -1,6 +1,0 @@
-; Project Euler 5
-(main
-  (def n 20)
-  (for (def i 19) (>= i 2) (-- i)
-    (when (!= 0 (% n i)) (+= n 20) (= i 20)))
-  (prn n))
