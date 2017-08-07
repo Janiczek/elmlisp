@@ -24,7 +24,9 @@ fi;
 
 redraw_and_run;
 
-inotifywait -mqr -e close_write,attrib,move,create,delete --format '%w' ./tests ./src @compiled | while read DIR; do
+inotifywait -mqr -e close_write,move,create,delete --format '%w %e %f' ./tests ./src @compiled | while read DIR EVENT FILE; do
+
+  # echo "${EVENT} ${DIR} ${FILE}" >>events.txt # debugging for why it recompiles twice in a row
 
   if [ "${DIR}" == "./src/" ]; then
     compile;

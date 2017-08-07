@@ -6,8 +6,8 @@
          format-type
          format-module
          format-type-definition
-         format-arguments)
-         ;format-cases
+         format-arguments
+         format-cases)
 
 (require "helpers.rkt")
 
@@ -93,11 +93,8 @@
     (string-join (map ~a arguments) " ")
     (~a arguments)))
 
-; TODO: format-cases
-; will be used for (case)
-; -----------------------
 ; ((True 1) (False 0))              => True -> 1 \n False -> 0
 ; ((Inc 1) ((IncBy amount) amount)) => Inc -> 1 \n IncBy amount -> amount
 ; -----------------------
-;(define (format-cases cases)
-;  (string-join ... ""))
+(define (format-cases cases)
+  "1")

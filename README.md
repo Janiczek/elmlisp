@@ -102,12 +102,12 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 
 - [ ] some commandline friendliness, dude
 - [ ] examples of macros
-- [ ] Elm records, tuples, lists
+- [ ] Elm records, tuples, lists: [here's how **#lang clojure** does it](https://github.com/takikawa/racket-clojure/blob/master/clojure/reader.rkt#L28-L36)
 
 - [ ] `(defn)` (both with and without type annotations)
 - [ ] `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
 - [ ] `(type-alias)` with records
-- [ ] `(case)` both with and without wildcard, and destructuring
+- [ ] `(case)` (tests) both with and without wildcard, and destructuring
 - [ ] `(let)` (with destructuring too)
 
 - [ ] comments

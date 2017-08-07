@@ -1,15 +1,5 @@
 #lang racket
 
-; TODO: curly braces { } must create Elm records, not Racket lists
-; see https://github.com/takikawa/racket-clojure/blob/master/clojure/reader.rkt#L28-L36
-
-;   (type-alias User { name String, age Int }
-; => type alias User = { name : String, age : Int }
-; currently:
-; => type alias User = name String age Int
-
-; This can be done by reading {...} into (elm-record ...) and then having  case for that in (compile-expr
-
 (require threading
          "format.rkt"
          "parse.rkt")
@@ -32,152 +22,155 @@
 
 (define (macroexpand-1 lst)
   (syntax->datum
-   (expand-to-top-form
-    (eval `(syntax ,lst) ns))))
+    (expand-to-top-form
+      (eval `(syntax ,lst) ns))))
 
 (define macros (mutable-set))
 ; ----------------------------------
 
 ; This is where we emit Elm code.
 (define (compile-expr e)
-  (cond [(and (list? e) (not (empty? e)))
-         (if (set-member? macros (first e))
-             (compile-expr (macroexpand-1 e)) ; run macros first, then generate Elm code!
-             (let ([f (first e)])
-               (case f
+  (if (and (list? e) (not (empty? e)))
 
-                 ; Macros -- the magic sauce. I have little idea how they work internally though.
-                 [(define-syntax)
-                  (let ([id (second e)])
-                    (when (list? id)
-                      (set! id (first id)))
-                    (set-add! macros id))
-                  (eval e ns)
-                  ""]
-                 
-                 [(define-syntax-rule)
-                  (let ([id (first (second e))])
-                    (set-add! macros id))
-                  (eval e ns)
-                  ""]
+    (if (set-member? macros (first e))
+      (compile-expr (macroexpand-1 e)) ; run macros first, then generate Elm code!
 
-                 ; (module Main)                     => module Main exposing (..)
-                 ; (module Foo exposing (main view)) => module Foo exposing (main, view)
-                 ; (module Nested.Bar exposing (..)) => module Nested.Bar exposing (..)
-                 ; (module Baz exposing ((Msg (..))) => module Baz exposing (Msg(..))
-                 [(module)
-                  (format-module e "module")]
+      (case (first e)
 
-                 [(port-module)
-                  (format-module e "port module")]
+        ; Macros -- the magic sauce!
+        [(define-syntax)      (handle-define-syntax e)]
+        [(define-syntax-rule) (handle-define-syntax-rule e)]
 
-                 ; TODO effect module
+        ; Elm syntax
+        [(module)      (compile-module e)]
+        [(port-module) (compile-port-module e)]
+        [(import)      (compile-import e)]
+        [(type-alias)  (compile-type-alias e)]
+        [(type)        (compile-type e)]
+        [(input-port)  (compile-input-port e)]
+        [(output-port) (compile-output-port e)]
+        [(lambda)      (compile-lambda e)]
+        [(def)         (compile-def e)]
+        [(if)          (compile-if e)]
+        [(case)        (compile-case e)]
 
-                 ; (import Foo)                      => import Foo
-                 ; (import Foo as F)                 => import Foo as F
-                 ; (import Foo exposing (bar baz))   => import Foo exposing (bar, baz)
-                 ; (import Foo as F exposing (..))   => import Foo as F exposing (..)
-                 ; (import Foo exposing ((Msg (..))) => import Foo exposing (Msg(..))
-                 [(import)
-                  (case (length e)
-                    [(2) ; import
-                     (format "import ~a" (second e))]
-                    
-                    [(4) ; import as / import exposing
-                     (case (third e)
-                       [(as)
-                        (format "import ~a as ~a"
-                                (second e)
-                                (fourth e))]
-                       
-                       [(exposing)
-                        (format "import ~a exposing (~a)"
-                                (second e)
-                                (format-exposing (fourth e)))])]
-                    
-                    [(6) ; import as exposing
-                     (format "import ~a as ~a exposing (~a)"
-                             (second e) 
-                             (fourth e)
-                             (format-exposing (sixth e)))])]
+        [else (show-as-is e)]))
 
-                 ; (type-alias Model Int)                    => type alias Model = Int
-                 ; TODO: (type-alias User { name String, age Int } => type alias User = { name : String, age : Int }
-                 ; (type-alias MyHtml (Html Int))            => type alias MyHtml = Html Int
-                 ; (type-alias MyCmd (Cmd (List String)))    => type alias MyCmd = Cmd (List String)
-                 ; (type-alias (Param a) (Html (List a)))    => type alias Param a = Html (List a)
-                 [(type-alias)
-                  (format "type alias ~a =\n    ~a"
-                          (format-type (second e))
-                          (format-type (third e)))]
+    ; TODO: maybe the deleted C++ stuff will still be useful
+    ; https://bitbucket.org/ktg/l/src/57a5293aa0f040c81afd799364f3aaacaf8676fa/l++.rkt?at=master&fileviewer=file-view-default#l%2B%2B.rkt-60:122
 
-                 ; (type Bool True False)            => type Bool = True | False
-                 ; (type (Maybe a) Nothing (Just a)) => type Maybe a = Nothing | Just a
-                 ; (type Msg Inc (DecBy Int))        => type Msg = Inc | DecBy Int
-                 [(type)
-                  (format "type ~a\n    = ~a"
-                          (format-type (second e))
-                          (format-type-definition (list-tail e 2)))]
-                 
-                 ; (input-port listen Bool) => port listen : (Bool -> msg) -> Sub msg
-                 [(input-port)
-                  (format "port ~a : (~a -> msg) -> Sub msg"
-                          (second e)
-                          (format-type (third e)))]
+    (show-as-is e)))
 
-                 ; (output-port sendToJs String) => port sendToJs : String -> Cmd msg
-                 [(output-port)
-                  (format "port ~a : ~a -> Cmd msg"
-                          (second e)
-                          (format-type (third e)))]
+(define (show-as-is expr)
+  ((if (string? expr) ~s ~a) expr))
 
-                 ; (lambda x (+ x 1))     => \x -> x + 1
-                 ; (lambda (x y) (+ x y)) => \x y -> x + y
-                 [(lambda)
-                  (format "\\~a -> ~a"
-                          (format-arguments (second e))
-                          (compile-expr (third e)))]
+(define (handle-define-syntax expr)
+  (define (register-macro id expr)
+    (set-add! macros id)
+    (eval expr ns)
+    "")
+  (match expr
+         [`(handle-define-syntax ,id ,_)
+           (register-macro id expr)]
 
-                 ; (def val 1)       => x = 1
-                 ; (def val : Int 1) => x : Int \n x = 1
-                 [(def)
-                  (case (length e)
-                    [(3)
-                     (format "~a =\n    ~a"
-                             (second e)
-                             (third e))]
+         [`(handle-define-syntax (,id ,_) ,_)
+           (register-macro id expr)]))
 
-                    [(5)
-                     (format "~a : ~a\n~a =\n    ~a"
-                             (second e)
-                             (format-type (fourth e))
-                             (second e)
-                             (compile-expr (fifth e)))])]
+(define (handle-define-syntax-rule expr)
+  (match expr
+         [`(handle-define-syntax-rule (,id ,_))
+           (set-add! macros id)
+           (eval expr ns)
+           ""]))
 
-                 ; (if True "a" "b") => if True then "a" else "b"
-                 [(if)
-                  (format "if ~a then ~a else ~a"
-                          (compile-expr (second e))
-                          (compile-expr (third e))
-                          (compile-expr (fourth e)))]
+(define (compile-module expr)
+  (format-module expr "module"))
 
-                 ; (case msg (Inc 1) ((IncBy amount) amount)) => case msg of Inc -> 1 \n IncBy amount -> amount
-                 ;[(case)
-                 ; (format "case ~a of\n~a"
-                 ;         (compile-expr (second e))
-                 ;         (format-cases))]
+(define (compile-port-module expr)
+  (format-module expr "port module"))
 
-                 ; anything else -> show as is
-                 [else ((if (string? e)
-                            ~s
-                            ~a)
-                        e)])))]
+(define (compile-import expr)
+  (match expr
+         [`(import ,name)
+           (format "import ~a"
+                   name)]
 
-        ; TODO maybe the deleted C++ stuff will still be useful
-        ; https://bitbucket.org/ktg/l/src/57a5293aa0f040c81afd799364f3aaacaf8676fa/l++.rkt?at=master&fileviewer=file-view-default#l%2B%2B.rkt-60:122
-                 
-        ; anything else -> show as is
-        [else ((if (string? e)
-                   ~s
-                   ~a)
-               e)]))
+         [`(import ,name as ,alias)
+           (format "import ~a as ~a"
+                   name
+                   alias)]
+
+         [`(import ,name exposing ,exposed)
+           (format "import ~a exposing (~a)"
+                   name
+                   (format-exposing exposed))]
+
+         [`(import ,name as ,alias exposing ,exposed)
+           (format "import ~a as ~a exposing (~a)"
+                   name
+                   alias
+                   (format-exposing exposed))]))
+
+(define (compile-type-alias expr)
+  (match expr
+         [`(type-alias ,alias ,type)
+           (format "type alias ~a =\n    ~a"
+                   (format-type alias)
+                   (format-type type))]))
+
+(define (compile-type expr)
+  (match expr
+         [`(type ,name . ,constructors)
+           (format "type ~a\n    = ~a"
+                   (format-type name)
+                   (format-type-definition constructors))]))
+
+(define (compile-input-port expr)
+  (match expr
+         [`(input-port ,name ,type)
+           (format "port ~a : (~a -> msg) -> Sub msg"
+                   name
+                   (format-type type))]))
+
+(define (compile-output-port expr)
+  (match expr
+         [`(output-port ,name ,type)
+           (format "port ~a : ~a -> Cmd msg"
+                   name
+                   (format-type type))]))
+
+(define (compile-lambda expr)
+  (match expr
+         [`(lambda ,arguments ,body)
+           (format "\\~a -> ~a"
+                   (format-arguments arguments)
+                   (compile-expr body))]))
+
+(define (compile-def expr)
+  (match expr
+         [`(def ,name ,definition)
+           (format "~a =\n    ~a"
+                   name
+                   definition)]
+
+         [`(def ,name : ,type ,definition)
+           (format "~a : ~a\n~a =\n    ~a"
+                   name
+                   (format-type type)
+                   name
+                   (compile-expr definition))]))
+
+(define (compile-if expr)
+  (match expr
+         [`(if ,condition ,then ,else)
+           (format "if ~a then ~a else ~a"
+                   (compile-expr condition)
+                   (compile-expr then)
+                   (compile-expr else))]))
+
+(define (compile-case expr)
+  (match expr
+         [`(case ,var . ,cases)
+           (format "case ~a of\n~a"
+                   (compile-expr var)
+                   (format-cases cases))]))
