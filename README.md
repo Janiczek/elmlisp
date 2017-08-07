@@ -1,5 +1,5 @@
 # ElmLisp
-> A LISP syntax for Elm language, and an ElmLisp → Elm transpiler. 
+> An experimental LISP syntax for Elm language, and an ElmLisp → Elm transpiler. 
 
 ----
 
@@ -51,23 +51,27 @@ So far, this is just a different syntax for Elm, and in itself is not worth writ
 
 ----
 
-### Running interpreted (requires Racket):
+### Usage:
 
+You can read input code from STDIN:
 ```
-$ racket elmlang.rkt
+$ elmlisp
 ```
 
-Right now doesn't support input from STDIN or from file of your own choosing - and reads the file `elm-examples/all-syntax.ell` instead. Bug me about this and I will fix this!
+Or from a file:
+```
+$ elmlisp input.ell
+```
 
-----
+You can run the compiler with Racket interpreter instead of a binary, simply substitute `elmlisp` for `racket src/elmlisp.rkt` (this requires Racket).
 
 ### Compiling from source (also requires Racket!):
 
 ```
-$ raco exe elmlang.rkt
+$ raco exe src/elmlisp.rkt
 ```
 
-Will create an `elmlang` binary in your current directory.
+Will create an `elmlisp` binary in your current directory.
 
 ----
 
@@ -77,13 +81,18 @@ Will create an `elmlang` binary in your current directory.
 - elm-examples/
     - all-syntax.ell - All possible (implemented and planned) syntax for ElmLisp, this is my
                        input file when developing...
+
+- run_tests.sh - Test runner.
+- tests/ - Diff tests - input files and expected output files.
+
  
-- elmlisp.rkt - Application entrypoint. Run/compile this file.
-- format.rkt - Helper functions for how to emit Elm source code.
-- parse.rkt - Module concerned with how to read string with ElmLisp source code into s-expressions.
-              (How to read commas? How to read [] {} #[]? Etc.)
-- compile.rkt - The meat of the application. Recursively compiles various s-expressions
-                into Elm source code strings.
+- src/
+    - elmlisp.rkt - Application entrypoint. Run/compile this file.
+    - format.rkt - Helper functions for how to emit Elm source code.
+    - parse.rkt - Module concerned with how to read string with ElmLisp source code into s-expressions.
+                  (How to read commas? How to read [] {} #[]? Etc.)
+    - compile.rkt - The meat of the application. Recursively compiles various s-expressions
+                    into Elm source code strings.
 ```
 
 ----
