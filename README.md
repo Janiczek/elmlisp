@@ -63,15 +63,19 @@ Or from a file:
 $ elmlisp input.ell
 ```
 
-You can run the compiler with Racket interpreter instead of a binary, simply substitute `elmlisp` for `racket src/elmlisp.rkt` (this requires Racket).
+### Download:
+
+- [v0.0.3 (Linux 64bit)](https://raw.githubusercontent.com/Janiczek/elmlisp/0.0.3/dist/elmlisp)
 
 ### Compiling from source (also requires Racket!):
+
+This will create an `elmlisp` binary in the src/ folder:
 
 ```
 $ raco exe src/elmlisp.rkt
 ```
 
-Will create an `elmlisp` binary in your current directory.
+Alternatively, you can run the compiler with Racket interpreter instead of a binary, simply substitute `elmlisp` for `racket src/elmlisp.rkt` (this requires Racket).
 
 ----
 
@@ -96,25 +100,31 @@ Will create an `elmlisp` binary in your current directory.
 
 ### TODO
 
-- [ ] refactoring of `compile.rkt` into helper funtions in `format.rkt` (all the `(format "..." ...)` calls)
-- [ ] Elm records, tuples, lists
-- [ ] `defn` (both with and without type annotations)
 - [ ] examples of macros
+- [ ] Elm records, tuples, lists
+
+- [ ] `(defn)` (both with and without type annotations)
 - [ ] `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
 - [ ] `(type-alias)` with records
-- [ ] all the `(module)` definitions rendered at the top (it's technically an error, but the Elm compiler will tell you that)
-- [ ] all the `(import)` definitions rendered at the top, sorted
-- [ ] maybe use `elm-format` on the result? cmd-line option for that?
-- [ ] destructuring in fn arguments
-- [ ] destructuring in fn arguments - what about ADTs with one constructor?
 - [ ] `(case)` both with and without wildcard, and destructuring
 - [ ] `(let)` (with destructuring too)
+
 - [ ] comments
+- [ ] destructuring in fn arguments
+- [ ] destructuring in fn arguments - what about ADTs with one constructor?
+
+- [ ] all the `(module)` definitions rendered at the top (it's technically an error, but the Elm compiler will tell you that)
+- [ ] all the `(import)` definitions rendered at the top, sorted
+
+- [ ] refactoring of `compile.rkt` into helper funtions in `format.rkt` (all the `(format "..." ...)` calls)
+- [ ] maybe use `elm-format` on the result? cmd-line option for that?
+
 - [ ] binary ops from base
 - [ ] macro for specifying stuff as binary ops (ElmLisp can't know about library's operators)
+- [ ] operators that are both binary and unary (`-`)
+
 - [ ] how will #t and #f vs True and False play out in macros etc.?
 - [ ] maybe try creating a `(where)` alternative to `(let)` as an macro, if that even makes sense in ElmLisp
-- [ ] operators that are both binary and unary (`-`)
 
 ----
 

@@ -9,7 +9,7 @@
 
 (provide compile)
 
-(define version "0.0.2")
+(define version "0.0.3")
 
 ; 1. read the cmdline arguments (currently we only accept a filename to compile
 (define arguments (current-command-line-arguments))
