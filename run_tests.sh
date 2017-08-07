@@ -3,6 +3,11 @@
 COLOR_OFF="\e[0m";
 DIM="\e[2m";
 
+function compile {
+  echo "Sources changed, recompiling!";
+  raco exe test_runner.rkt;
+}
+
 function redraw_and_run {
   clear;
 
@@ -10,12 +15,22 @@ function redraw_and_run {
   date -R;
   echo -en "${COLOR_OFF}";
 
-  racket test_runner.rkt;
+  ./test_runner;
 }
+
+if [ ! -f test_runner ]; then
+  compile;
+fi;
 
 redraw_and_run;
 
-while inotifywait -qqre modify ./tests ./src; do
+inotifywait -mqr -e close_write,attrib,move,create,delete --format '%w' ./tests ./src @compiled | while read DIR; do
+
+  if [ "${DIR}" == "./src/" ]; then
+    compile;
+  fi;
+
   redraw_and_run;
+
 done;
 

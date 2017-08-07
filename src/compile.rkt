@@ -118,16 +118,16 @@
                   (format "type ~a\n    = ~a"
                           (format-type (second e))
                           (format-type-definition (list-tail e 2)))]
-
-                 ; (input-port sendToJs String) => port sendToJs : String -> Cmd msg
+                 
+                 ; (input-port listen Bool) => port listen : (Bool -> msg) -> Sub msg
                  [(input-port)
-                  (format "port ~a : ~a -> Cmd msg"
+                  (format "port ~a : (~a -> msg) -> Sub msg"
                           (second e)
                           (format-type (third e)))]
-                 
-                 ; (output-port listen Bool) => port listen : (Bool -> msg) -> Sub msg
+
+                 ; (output-port sendToJs String) => port sendToJs : String -> Cmd msg
                  [(output-port)
-                  (format "port ~a : (~a -> msg) -> Sub msg"
+                  (format "port ~a : ~a -> Cmd msg"
                           (second e)
                           (format-type (third e)))]
 
