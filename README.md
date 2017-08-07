@@ -100,6 +100,7 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 
 ### TODO
 
+- [ ] some commandline friendliness, dude
 - [ ] examples of macros
 - [ ] Elm records, tuples, lists
 
