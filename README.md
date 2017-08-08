@@ -106,6 +106,8 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 - destructuring (in fn arguments and other places, ADTs with one constructor, etc.)
 - parens in nested calls of operators, ie `(^ 1 (^ 2 3)) => 1 ^ (2 ^ 3)`
 - operator `||`, `|>`, `<|` (ditch/change verbatim syntax and let `||` be a symbol)
+- record updating
+- extensible records!
 
 #### Nice to have
 - some commandline friendliness, dude
