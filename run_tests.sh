@@ -39,7 +39,7 @@ fi;
 
 rm -f ${ERRORS_FILE};
 
-inotifywait -mqr -e close_write,move,create,delete --format '%w %e %f' ./tests ./src ./test_runner.rkt @compiled | while read DIR EVENT FILE; do
+inotifywait -mqr -e close_write,move,create,delete --format '%w %e %f' ./tests ./src ./examples ./test_runner.rkt @compiled | while read DIR EVENT FILE; do
 
   #echo "event: ${EVENT} // dir: ${DIR} // file: ${FILE}" >>events.txt # debugging
 
