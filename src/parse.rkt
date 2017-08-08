@@ -20,12 +20,31 @@
                   'terminating-macro
                   read-as-whitespace
 
-                  ; treat ~ as , in the current readtable (unquote?)
+                  ; treat ~ as , in the current readtable (unquote)
                   #\~
                   #\,
-                  (current-readtable)))
-
+                  (current-readtable)
+                  
+                  #\[
+                  'terminating-macro
+                  read-elm-list))
 
 ; basically, ignore whatever you've been given
 (define (read-as-whitespace . do-not-care)
   (make-special-comment #f))
+
+; [abc ...] -> (elm-list abc ...)
+(define (read-elm-list ch in src ln col pos)
+  (define list-syntax
+    (parameterize ([read-accept-dot #f])
+                  (read-syntax/recursive
+                    src in ch
+                    (make-readtable (current-readtable)
+                                    ch #\[ #f))))
+  (define list (syntax->list list-syntax))
+  (datum->syntax
+    list-syntax
+    #`(elm-list #,@list)`
+    ,list-syntax
+    list-syntax))
+

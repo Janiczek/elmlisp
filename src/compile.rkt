@@ -69,6 +69,9 @@
               variadic-operator
               variadic-predicate) (handle-operator e)]
 
+           ; Data structures
+           [(elm-list) (compile-list e)]
+
            ; Elm syntax
            [(module)      (compile-module e)]
            [(port-module) (compile-port-module e)]
@@ -113,6 +116,16 @@
          op))
   "")
 
+(define (compile-list expr)
+  (match expr
+         [`(elm-list . ,elements)
+           (case (length elements)
+             [(0) "[]"]
+             [else (format "[ ~a ]"
+                           (string-join (map compile-expr elements)
+                                        ", "))])]))
+           
+           
 (define (compile-binary-operator expr)
   (match expr
          [`(,op ,a ,b)
