@@ -113,6 +113,7 @@ If you have Racket installed:
 - extensible records!
 
 #### Nice to have
+- square brackets for defn arguments will probably be nicer... my Clojure heritage shows :)
 - somehow break up long lines (eg. any substantial `view` function)
 - some commandline friendliness, dude
 - all the `(module)` definitions rendered at the top (it's technically an error, but we let the Elm compiler tell you that)
