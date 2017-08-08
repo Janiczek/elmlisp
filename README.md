@@ -119,9 +119,8 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 - [ ] refactoring of `compile.rkt` into helper funtions in `format.rkt` (all the `(format "..." ...)` calls)
 - [ ] maybe use `elm-format` on the result? cmd-line option for that?
 
-- [ ] binary ops from base
-- [ ] macro for specifying stuff as binary ops (ElmLisp can't know about library's operators)
-- [ ] operators that are both binary and unary (`-`)
+- [ ] operator `||`, `|>`, `<|` (ditch/change verbatim syntax and let `||` be a symbol)
+- [ ] parens in nested calls of operators, ie `(^ 1 (^ 2 3)) => 1 ^ (2 ^ 3)`
 
 - [ ] how will #t and #f vs True and False play out in macros etc.?
 - [ ] maybe try creating a `(where)` alternative to `(let)` as an macro, if that even makes sense in ElmLisp

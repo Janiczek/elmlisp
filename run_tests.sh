@@ -7,8 +7,12 @@ RED="\e[31m";
 DIM="\e[2m";
 
 function compile {
-  echo "Sources changed, recompiling!";
   raco exe test_runner.rkt &>${ERRORS_FILE};
+}
+
+function recompile {
+  echo "Sources changed, recompiling!";
+  compile;
 }
 
 function redraw_and_run {
@@ -25,9 +29,7 @@ function show_compiler_errors {
   echo -e "${RED}\nErrors:\n${COLOR_OFF}$(cat ${ERRORS_FILE})\n";
 }
 
-if [ ! -f test_runner ]; then
-  compile;
-fi;
+compile;
 
 if [[ -z $(cat ${ERRORS_FILE}) ]]; then
   redraw_and_run;
@@ -42,7 +44,7 @@ inotifywait -mqr -e close_write,move,create,delete --format '%w %e %f' ./tests .
   #echo "event: ${EVENT} // dir: ${DIR} // file: ${FILE}" >>events.txt # debugging
 
   if [ "${DIR}" == "./src/" ] || [ "${DIR}" == "./test_runner.rkt" ]; then
-    compile;
+    recompile;
   fi;
 
   if [[ -z $(cat ${ERRORS_FILE}) ]]; then

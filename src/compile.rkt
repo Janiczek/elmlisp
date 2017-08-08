@@ -28,39 +28,62 @@
 (define macros (mutable-set))
 ; ----------------------------------
 
+; Operators
+(define binary-operators    (mutable-set '! '::))
+(define variadic-operators  (mutable-set '&& '+ '- '* '/ '// '% '^ '++ '<< '>>)) 
+(define variadic-predicates (mutable-set '== '/= '< '> '<= '>=)) 
+
 ; This is where we emit Elm code.
 (define (compile-expr e)
-  (if (and (list? e) (not (empty? e)))
+  (cond
 
-    (if (set-member? macros (first e))
-      (compile-expr (macroexpand-1 e)) ; run macros first, then generate Elm code!
+    ; Things that are not in (this kind of form)
+    [(or (not (list? e)) (empty? e))
+     (show-as-is e)]
 
-      (case (first e)
+    ; Expand macros and compile the result!
+    [(set-member? macros (first e))
+     (compile-expr (macroexpand-1 e))]
 
-        ; Macros -- the magic sauce!
-        [(define-syntax)      (handle-define-syntax e)]
-        [(define-syntax-rule) (handle-define-syntax-rule e)]
+    ; Operators. We don't match on a fixed set of them because user can define his own / use library that defined one.
+    [(set-member? binary-operators (first e))
+     (compile-binary-operator e)]
 
-        ; Elm syntax
-        [(module)      (compile-module e)]
-        [(port-module) (compile-port-module e)]
-        [(import)      (compile-import e)]
-        [(type-alias)  (compile-type-alias e)]
-        [(type)        (compile-type e)]
-        [(input-port)  (compile-input-port e)]
-        [(output-port) (compile-output-port e)]
-        [(lambda)      (compile-lambda e)]
-        [(def)         (compile-def e)]
-        [(defn)        (compile-defn e)]
-        [(if)          (compile-if e)]
-        [(case)        (compile-case e)]
+    [(set-member? variadic-operators (first e))
+     (compile-variadic-operator e)]
 
-        [else (show-as-is e)]))
+    ; Variadic predicates are joined by && 
+    [(set-member? variadic-predicates (first e))
+     (compile-variadic-predicate e)]
 
-    ; TODO: maybe the deleted C++ stuff will still be useful
-    ; https://bitbucket.org/ktg/l/src/57a5293aa0f040c81afd799364f3aaacaf8676fa/l++.rkt?at=master&fileviewer=file-view-default#l%2B%2B.rkt-60:122
+    ; Everything else is here.
+    [else
+     (case (first e)
 
-    (show-as-is e)))
+           ; Macros -- the magic sauce!
+           [(define-syntax)      (handle-define-syntax e)]
+           [(define-syntax-rule) (handle-define-syntax-rule e)]
+
+           ; Flag as operator
+           [(binary-operator
+              variadic-operator
+              variadic-predicate) (handle-operator e)]
+
+           ; Elm syntax
+           [(module)      (compile-module e)]
+           [(port-module) (compile-port-module e)]
+           [(import)      (compile-import e)]
+           [(type-alias)  (compile-type-alias e)]
+           [(type)        (compile-type e)]
+           [(input-port)  (compile-input-port e)]
+           [(output-port) (compile-output-port e)]
+           [(lambda)      (compile-lambda e)]
+           [(def)         (compile-def e)]
+           [(defn)        (compile-defn e)]
+           [(if)          (compile-if e)]
+           [(case)        (compile-case e)]
+
+           [else (show-as-is e)])]))
 
 (define (show-as-is expr)
   ((if (string? expr) ~s ~a) expr))
@@ -71,18 +94,56 @@
     (eval expr ns)
     "")
   (match expr
-         [`(handle-define-syntax ,id ,_)
+         [`(define-syntax ,id ,_)
            (register-macro id expr)]
 
-         [`(handle-define-syntax (,id ,_) ,_)
+         [`(define-syntax (,id ,_) ,_)
            (register-macro id expr)]))
 
 (define (handle-define-syntax-rule expr)
   (match expr
-         [`(handle-define-syntax-rule (,id ,_))
+         [`(define-syntax-rule (,id ,_))
            (set-add! macros id)
            (eval expr ns)
            ""]))
+
+(define (handle-operator expr)
+  (for ([op (rest expr)])
+       (set-add!
+         (match expr
+                [`(binary-operator . ,_)   binary-operators]
+                [`(variadic-operator . ,_) variadic-operators]
+                [`(variadic-predicate . ,_) variadic-predicates])
+         op))
+  "")
+
+(define (compile-binary-operator expr)
+  (match expr
+         [`(,op ,a ,b)
+           (format "~a ~a ~a"
+                   (compile-expr a)
+                   op
+                   (compile-expr b))]))
+
+(define (compile-variadic-operator expr)
+  (match expr
+         [`(,op . ,arguments)
+           (string-join (map compile-expr arguments)
+                        (format " ~a " op))]))
+
+(define (compile-variadic-predicate expr)
+  (match expr
+         [`(,op ,a ,b . ,rest)
+          (if (empty? rest)
+            (format "~a ~a ~a"
+                    (compile-expr a)
+                    op
+                    (compile-expr b))
+            (format "~a ~a ~a && ~a"
+                    (compile-expr a)
+                    op
+                    (compile-expr b)
+                    (compile-variadic-predicate `(,op ,b ,@rest))))]))
 
 (define (compile-module expr)
   (format-module expr "module"))

@@ -1,1 +1,2 @@
-(defn foo (bar) 1)
+(defn foo (bar)
+  1)

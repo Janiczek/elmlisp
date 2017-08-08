@@ -1,0 +1,2 @@
+(variadic-predicate =!=)
+(=!= a b c)

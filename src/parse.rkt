@@ -14,17 +14,18 @@
 ; readtable allowing us to read stuff differently (atm color, but hopefully [] {} #[])
 (define (elmlisp-readtable)
   (make-readtable (current-readtable)
-                  
+
                   ; treat , as whitespace
                   #\,
                   'terminating-macro
                   read-as-whitespace
 
-                  ; treat < as , in the current readtable (unquote?)
-                  #\<
+                  ; treat ~ as , in the current readtable (unquote?)
+                  #\~
                   #\,
                   (current-readtable)))
 
+
 ; basically, ignore whatever you've been given
-(define (read-as-whitespace . a)
+(define (read-as-whitespace . do-not-care)
   (make-special-comment #f))
