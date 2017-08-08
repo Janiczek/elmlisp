@@ -1,0 +1,26 @@
+(define-syntax-rule
+
+  ; from...
+  (unless condition
+    true-expr
+    false-expr)
+
+  ; ...to
+  (if condition
+    false-expr
+    true-expr))
+
+(unless (== 3 5)
+  "three is not equal to five"
+  "this shouldn't happen")
+
+; this gets expanded into
+;
+; (if (== 3 5)
+;   "this shouldn't happen"
+;   "three is not equal to five")
+;
+; which gets compiled to Elm code.
+
+
+

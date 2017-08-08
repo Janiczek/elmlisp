@@ -99,13 +99,13 @@
     (eval expr ns)
     "")
   (match expr
-         [`(define-syntax ,id ,_)
+         [`(define-syntax ,id . ,_)
            (register-macro id expr)]
 
          [`(define-syntax (,id ,_) ,_)
            (register-macro id expr)]
 
-         [`(define-syntax-rule (,id ,_))
+         [`(define-syntax-rule (,id . ,_) . ,_)
            (register-macro id expr)]))
 
 (define (handle-operator expr)
@@ -278,7 +278,7 @@
 (define (compile-if expr)
   (match expr
          [`(if ,condition ,then ,else)
-           (format "if ~a then ~a else ~a"
+           (format "if ~a then\n    ~a\nelse\n    ~a"
                    (compile-expr condition)
                    (compile-expr then)
                    (compile-expr else))]))

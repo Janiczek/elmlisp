@@ -1,0 +1,4 @@
+if 3 == 5 then
+    "this shouldn't happen"
+else
+    "three is not equal to five"
