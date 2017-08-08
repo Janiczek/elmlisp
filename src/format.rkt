@@ -7,7 +7,8 @@
          format-module
          format-type-definition
          format-arguments
-         format-cases)
+         format-cases
+         format-record-field-value)
 
 (require "helpers.rkt")
 
@@ -125,4 +126,11 @@
          [`(,constructor ,value)
           (format "    ~a ->\n        ~a"
                   (format-type constructor)
+                  value)]))
+
+(define (format-record-field-value pair)
+  (match pair
+         [`(,field ,value)
+          (format "~a = ~a"
+                  field
                   value)]))

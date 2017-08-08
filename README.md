@@ -100,11 +100,11 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 
 - [ ] some commandline friendliness, dude
 - [ ] examples of macros
-- [ ] Elm records, tuples: [here's how **#lang clojure** does it](https://github.com/takikawa/racket-clojure/blob/master/clojure/reader.rkt#L28-L36)
 
 - [ ] `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
-- [ ] `(type-alias)` with records
 - [ ] `(let)` (with destructuring too)
+- [ ] records in types format differently
+- [ ] `(type-alias)` with records
 
 - [ ] comments
 - [ ] destructuring in fn arguments

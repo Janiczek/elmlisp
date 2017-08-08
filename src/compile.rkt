@@ -14,7 +14,7 @@
        (format-compiled-code)))
 
 ; ----------------------------------
-; Racket-y macro magic.
+; Racket macro magic.
 (define-namespace-anchor anc)
 
 (define ns
@@ -58,36 +58,37 @@
 
     ; Everything else is here.
     [else
-     (case (first e)
+      (case (first e)
 
-           ; Macros -- the magic sauce!
-           [(define-syntax
-              define-syntax-rule) (handle-macro e)]
+        ; Macros -- the magic sauce!
+        [(define-syntax
+           define-syntax-rule) (handle-macro e)]
 
-           ; Flag as operator
-           [(binary-operator
-              variadic-operator
-              variadic-predicate) (handle-operator e)]
+        ; Flag as operator
+        [(binary-operator
+           variadic-operator
+           variadic-predicate) (handle-operator e)]
 
-           ; Data structures
-           [(elm-list)  (compile-list e)]
-           [(elm-tuple) (compile-tuple e)]
+        ; Data structures
+        [(elm-list)   (compile-list e)]
+        [(elm-tuple)  (compile-tuple e)]
+        [(elm-record) (compile-record e)]
 
-           ; Elm syntax
-           [(module)      (compile-module e)]
-           [(port-module) (compile-port-module e)]
-           [(import)      (compile-import e)]
-           [(type-alias)  (compile-type-alias e)]
-           [(type)        (compile-type e)]
-           [(input-port)  (compile-input-port e)]
-           [(output-port) (compile-output-port e)]
-           [(lambda)      (compile-lambda e)]
-           [(def)         (compile-def e)]
-           [(defn)        (compile-defn e)]
-           [(if)          (compile-if e)]
-           [(case)        (compile-case e)]
+        ; Elm syntax
+        [(module)      (compile-module e)]
+        [(port-module) (compile-port-module e)]
+        [(import)      (compile-import e)]
+        [(type-alias)  (compile-type-alias e)]
+        [(type)        (compile-type e)]
+        [(input-port)  (compile-input-port e)]
+        [(output-port) (compile-output-port e)]
+        [(lambda)      (compile-lambda e)]
+        [(def)         (compile-def e)]
+        [(defn)        (compile-defn e)]
+        [(if)          (compile-if e)]
+        [(case)        (compile-case e)]
 
-           [else (show-as-is e)])]))
+        [else (compile-function-call e)])]))
 
 (define (show-as-is expr)
   ((if (string? expr) ~s ~a) expr))
@@ -135,7 +136,26 @@
              [else (format "( ~a )"
                            (string-join (map compile-expr elements)
                                         ", "))])]))
-           
+
+(define (compile-record expr)
+  (match expr
+         [`(elm-record . ,elements)
+           (case (length elements)
+             [(0) "{}"]
+             [(1) (format "{ ~a }"
+                          (format-record-field-value (first elements)))]
+             [else (format "{ ~a }"
+                           (string-join
+                             (map (compose format-record-field-value
+                                           compile-one-record-field)
+                                  elements)
+                             ", "))])]))
+
+(define (compile-one-record-field pair)
+  (match pair
+         [`(,field ,value-or-type)
+           `(,field ,(compile-expr value-or-type))]))
+
 (define (compile-binary-operator expr)
   (match expr
          [`(,op ,a ,b)
@@ -153,16 +173,16 @@
 (define (compile-variadic-predicate expr)
   (match expr
          [`(,op ,a ,b . ,rest)
-          (if (empty? rest)
-            (format "~a ~a ~a"
-                    (compile-expr a)
-                    op
-                    (compile-expr b))
-            (format "~a ~a ~a && ~a"
-                    (compile-expr a)
-                    op
-                    (compile-expr b)
-                    (compile-variadic-predicate `(,op ,b ,@rest))))]))
+           (if (empty? rest)
+             (format "~a ~a ~a"
+                     (compile-expr a)
+                     op
+                     (compile-expr b))
+             (format "~a ~a ~a && ~a"
+                     (compile-expr a)
+                     op
+                     (compile-expr b)
+                     (compile-variadic-predicate `(,op ,b ,@rest))))]))
 
 (define (compile-module expr)
   (format-module expr "module"))
@@ -276,4 +296,9 @@
 (define (compile-one-case case)
   (match case
          [`(,constructor ,value)
-          `(,constructor ,(compile-expr value))]))
+           `(,constructor ,(compile-expr value))]))
+
+(define (compile-function-call expr)
+ (format "~a ~a"
+        (compile-expr (first expr))
+        (string-join (map compile-expr (rest expr)) " ")))

@@ -1,17 +1,16 @@
 #lang racket
 
+(require syntax/readerr)
+
 (provide parse)
 
 ; Let Racket reader do the heavy lifting (String -> S-exprs).
 ; We change it up a bit with our modified readtable...
-; ----------------
-; TODO: read {} #[] differently
-; https://github.com/takikawa/racket-clojure/blob/master/clojure/reader.rkt#L28-L36
 (define (parse code)
   (parameterize ([current-readtable (elmlisp-readtable)])
     (read (open-input-string code))))
 
-; readtable allowing us to read stuff differently (atm color, but hopefully [] {} #[])
+; readtable allowing us to read stuff differently (colon, [], {}, #[])
 (define (elmlisp-readtable)
   (make-readtable (current-readtable)
 
@@ -33,7 +32,11 @@
                   ; treat #[] as (elm-tuple)
                   #\[
                   'dispatch-macro
-                  read-elm-tuple))
+                  read-elm-tuple
+                  
+                  #\{
+                  'terminating-macro
+                  read-elm-record))
 
 ; basically, ignore whatever you've been given
 (define (read-as-whitespace . do-not-care)
@@ -50,8 +53,8 @@
   (define list (syntax->list list-syntax))
   (datum->syntax
     list-syntax
-    #`(elm-list #,@list)`
-    ,list-syntax
+    #`(elm-list #,@list)
+    list-syntax
     list-syntax))
 
 
@@ -66,6 +69,28 @@
   (define list (syntax->list list-syntax))
   (datum->syntax
     list-syntax
-    #`(elm-tuple #,@list)`
-    ,list-syntax
+    #`(elm-tuple #,@list)
+    list-syntax
+    list-syntax))
+
+; {abc def ...} -> (elm-record (abc def) ...)
+(define (read-elm-record ch in src ln col pos)
+  (define list-syntax
+    (parameterize ([read-accept-dot #f])
+                  (read-syntax/recursive src in ch
+                                         (make-readtable
+                                           (current-readtable)
+                                           ch #\{ #f))))
+  (define list (syntax->list list-syntax))
+  (define (groups-of-2 vals acc)
+    (match vals
+           [`()              acc]
+           [`(,a ,b . ,rest) (groups-of-2 rest (append acc `((,a ,b))))]))
+  (unless (even? (length list))
+    (raise-read-error "Records must have an even number of forms"
+                      src ln col pos (syntax-span list-syntax)))
+  (datum->syntax
+    list-syntax
+    #`(elm-record #,@(groups-of-2 list '()))
+    list-syntax
     list-syntax))
