@@ -34,7 +34,7 @@
 (define variadic-predicates (mutable-set '== '/= '< '> '<= '>=)) 
 
 ; This is where we emit Elm code.
-(define (compile-expr e)
+(define (compile-expr e #:nested? [nested? #f])
   (cond
 
     ; Things that are not in (this kind of form)
@@ -47,10 +47,10 @@
 
     ; Operators. We don't match on a fixed set of them because user can define his own / use library that defined one.
     [(set-member? binary-operators (first e))
-     (compile-binary-operator e)]
+     (compile-binary-operator e #:nested? nested?)]
 
     [(set-member? variadic-operators (first e))
-     (compile-variadic-operator e)]
+     (compile-variadic-operator e #:nested? nested?)]
 
     ; Variadic predicates are joined by && 
     [(set-member? variadic-predicates (first e))
@@ -143,30 +143,53 @@
            (case (length elements)
              [(0) "{}"]
              [else (format "{ ~a }"
-                    (string-join
-                      (map (compose format-record-pair-value
-                                    compile-one-record-field)
-                           elements)
-                      ", "))])]))
+                           (string-join
+                             (map (compose format-record-pair-value
+                                           compile-one-record-field)
+                                  elements)
+                             ", "))])]))
 
 (define (compile-one-record-field pair)
   (match pair
          [`(,field ,value)
            `(,field ,(compile-expr value))]))
 
-(define (compile-binary-operator expr)
+(define (compile-binary-operator expr #:nested? [nested? #f])
   (match expr
          [`(,op ,a ,b)
-           (format "~a ~a ~a"
-                   (compile-expr a)
+           (format (if nested? "(~a ~a ~a)" "~a ~a ~a")
+                   (compile-expr a #:nested? #t)
                    op
-                   (compile-expr b))]))
+                   (compile-expr b #:nested? #t))]))
 
-(define (compile-variadic-operator expr)
+(define (compile-variadic-operator expr #:nested? [nested? #f])
+  (define format-string
+    (if nested?
+      "(~a ~a ~a)"
+      "~a ~a ~a"))
   (match expr
+         [`(,op ,a)
+           (~a a)]
+
+         [`(,op ,a ,(? list? b))
+           (format format-string
+                   (compile-expr a #:nested? #t)
+                   op
+                   (compile-expr b #:nested? #t))]
+
+         [`(,op ,a ,b)
+           (format format-string
+                   (compile-expr a #:nested? #t)
+                   op
+                   (compile-expr b #:nested? #t))]
+
          [`(,op . ,arguments)
-           (string-join (map compile-expr arguments)
-                        (format " ~a " op))]))
+           (format (if nested? "(~a)" "~a")
+                   (string-join
+                     (map (lambda (sub-expr)
+                            (compile-expr sub-expr #:nested? #t))
+                          arguments)
+                     (format " ~a " op)))]))
 
 (define (compile-variadic-predicate expr)
   (match expr
@@ -297,6 +320,6 @@
            `(,constructor ,(compile-expr value))]))
 
 (define (compile-function-call expr)
- (format "~a ~a"
-        (compile-expr (first expr))
-        (string-join (map compile-expr (rest expr)) " ")))
+  (format "~a ~a"
+          (compile-expr (first expr))
+          (string-join (map compile-expr (rest expr)) " ")))
