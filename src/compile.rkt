@@ -142,19 +142,17 @@
          [`(elm-record . ,elements)
            (case (length elements)
              [(0) "{}"]
-             [(1) (format "{ ~a }"
-                          (format-record-field-value (first elements)))]
              [else (format "{ ~a }"
-                           (string-join
-                             (map (compose format-record-field-value
-                                           compile-one-record-field)
-                                  elements)
-                             ", "))])]))
+                    (string-join
+                      (map (compose format-record-pair-value
+                                    compile-one-record-field)
+                           elements)
+                      ", "))])]))
 
 (define (compile-one-record-field pair)
   (match pair
-         [`(,field ,value-or-type)
-           `(,field ,(compile-expr value-or-type))]))
+         [`(,field ,value)
+           `(,field ,(compile-expr value))]))
 
 (define (compile-binary-operator expr)
   (match expr

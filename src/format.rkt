@@ -8,7 +8,7 @@
          format-type-definition
          format-arguments
          format-cases
-         format-record-field-value)
+         format-record-pair-value)
 
 (require "helpers.rkt")
 
@@ -51,19 +51,18 @@
 ; basically remove outermost parens but otherwise leave as is
 ; with exception of (->)
 ; --------------------------------
-; TODO: what about records? will have to special-case here
-; (elm-record (name String) (age Int))
-; =>
-; { name : String , age : Int }
-; --------------------------------
-; String            => String
-; (Html Msg)        => Html Msg
-; (Html (List a))   => Html (List a)
-; (-> Int String)   => Int -> String
-; (-> Int (List a)) => Int -> List a
-; (-> (-> a b) a b) => (a -> b) -> a -> b
+; String             => String
+; (Html Msg)         => Html Msg
+; (Html (List a))    => Html (List a)
+; (-> Int String)    => Int -> String
+; (-> Int (List a))  => Int -> List a
+; (-> (-> a b) a b)  => (a -> b) -> a -> b
+; (elm-record a Int) => { a : Int }
 (define (format-type type #:nested? [nested? #f])
   (cond
+    [(is-record? type)
+     (format-record-type type)]
+     
     [(is-arrow-type? type)
      (if nested?
        (wrap-in-parens (format-arrow-type type))
@@ -75,6 +74,20 @@
     [else
       (~a type)]))
 
+(define (format-record-type type)
+  (case (length type)
+    [(0) "{}"]
+    [else (format "{ ~a }"
+                  (string-join (map (compose format-record-pair-type
+                                             format-record-pair-rhs)
+                                (rest type)) 
+                               " , "))]))
+
+(define (format-record-pair-rhs pair)
+  (match pair
+        [`(,field ,type)
+         `(,field ,(format-type type))]))
+
 (define (format-arrow-type type)
   (string-join (map (lambda (type-part)
                       (format-type type-part #:nested? #t))
@@ -82,8 +95,6 @@
                " -> "))
 
 ; allows module, port module
-; --------------------------
-; TODO: effect module - will have to research this one a bit!
 (define (format-module expr module-type)
   (match expr
          [`(,_ ,name)
@@ -128,7 +139,14 @@
                   (format-type constructor)
                   value)]))
 
-(define (format-record-field-value pair)
+(define (format-record-pair-type pair)
+  (match pair
+         [`(,field ,value)
+          (format "~a : ~a"
+                  field
+                  value)]))
+
+(define (format-record-pair-value pair)
   (match pair
          [`(,field ,value)
           (format "~a = ~a"

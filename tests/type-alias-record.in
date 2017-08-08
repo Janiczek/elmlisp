@@ -1,0 +1,2 @@
+(type-alias Model {count Int
+                   user {name String}})

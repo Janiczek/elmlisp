@@ -98,29 +98,28 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 
 ### TODO
 
-- [ ] some commandline friendliness, dude
-- [ ] examples of macros
+#### Minimum Viable Product
 
-- [ ] `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
-- [ ] `(let)` (with destructuring too)
-- [ ] records in types format differently
-- [ ] `(type-alias)` with records
+- examples of macros
+- `(let)` (with destructuring too)
+- comments (either make `;` stay in the Elm code as `--`, or have `(-- ...)` or something)
+- destructuring (in fn arguments and other places, ADTs with one constructor, etc.)
+- parens in nested calls of operators, ie `(^ 1 (^ 2 3)) => 1 ^ (2 ^ 3)`
+- operator `||`, `|>`, `<|` (ditch/change verbatim syntax and let `||` be a symbol)
 
-- [ ] comments
-- [ ] destructuring in fn arguments
-- [ ] destructuring in fn arguments - what about ADTs with one constructor?
+#### Nice to have
+- some commandline friendliness, dude
+- all the `(module)` definitions rendered at the top (it's technically an error, but we let the Elm compiler tell you that)
+- all the `(import)` definitions rendered at the top, sorted (even if some macro called it in the middle of the file)
+- maybe use `elm-format` on the result? cmd-line option for that?
 
-- [ ] all the `(module)` definitions rendered at the top (it's technically an error, but the Elm compiler will tell you that)
-- [ ] all the `(import)` definitions rendered at the top, sorted
+#### Meh
+- `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
+- refactoring of `compile.rkt` into helper funtions in `format.rkt` (all the `(format "..." ...)` calls)
 
-- [ ] refactoring of `compile.rkt` into helper funtions in `format.rkt` (all the `(format "..." ...)` calls)
-- [ ] maybe use `elm-format` on the result? cmd-line option for that?
-
-- [ ] operator `||`, `|>`, `<|` (ditch/change verbatim syntax and let `||` be a symbol)
-- [ ] parens in nested calls of operators, ie `(^ 1 (^ 2 3)) => 1 ^ (2 ^ 3)`
-
-- [ ] how will #t and #f vs True and False play out in macros etc.?
-- [ ] maybe try creating a `(where)` alternative to `(let)` as an macro, if that even makes sense in ElmLisp
+#### Research
+- how will #t and #f vs True and False play out in macros etc.?
+- maybe try creating a `(where)` alternative to `(let)` as an macro, if that even makes sense in ElmLisp
 
 ----
 
