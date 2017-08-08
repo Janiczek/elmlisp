@@ -4,7 +4,7 @@
 
 (provide compile)
 
-(define version "0.0.7")
+(define version "0.0.8")
 
 ; 1. read the cmdline arguments (currently we only accept a filename to compile
 (define arguments (current-command-line-arguments))

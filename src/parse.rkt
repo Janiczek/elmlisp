@@ -2,10 +2,10 @@
 
 (provide parse)
 
-; let Racket reader do the heavy lifting (String -> S-exprs)
-; we change it up a bit with our modified readtable
+; Let Racket reader do the heavy lifting (String -> S-exprs).
+; We change it up a bit with our modified readtable...
 ; ----------------
-; TODO: read [] {} #[] differently
+; TODO: read {} #[] differently
 ; https://github.com/takikawa/racket-clojure/blob/master/clojure/reader.rkt#L28-L36
 (define (parse code)
   (parameterize ([current-readtable (elmlisp-readtable)])
@@ -25,9 +25,15 @@
                   #\,
                   (current-readtable)
                   
+                  ; treat [] as (elm-list)
                   #\[
                   'terminating-macro
-                  read-elm-list))
+                  read-elm-list
+                  
+                  ; treat #[] as (elm-tuple)
+                  #\[
+                  'dispatch-macro
+                  read-elm-tuple))
 
 ; basically, ignore whatever you've been given
 (define (read-as-whitespace . do-not-care)
@@ -48,3 +54,18 @@
     ,list-syntax
     list-syntax))
 
+
+; #[abc ...] -> (elm-tuple abc ...)
+(define (read-elm-tuple ch in src ln col pos)
+  (define list-syntax
+    (parameterize ([read-accept-dot #f])
+                  (read-syntax/recursive
+                    src in ch
+                    (make-readtable (current-readtable)
+                                    ch #\[ #f))))
+  (define list (syntax->list list-syntax))
+  (datum->syntax
+    list-syntax
+    #`(elm-tuple #,@list)`
+    ,list-syntax
+    list-syntax))

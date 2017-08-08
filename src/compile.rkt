@@ -70,7 +70,8 @@
               variadic-predicate) (handle-operator e)]
 
            ; Data structures
-           [(elm-list) (compile-list e)]
+           [(elm-list)  (compile-list e)]
+           [(elm-tuple) (compile-tuple e)]
 
            ; Elm syntax
            [(module)      (compile-module e)]
@@ -124,7 +125,16 @@
              [else (format "[ ~a ]"
                            (string-join (map compile-expr elements)
                                         ", "))])]))
-           
+
+(define (compile-tuple expr)
+  (match expr
+         [`(elm-tuple . ,elements)
+           (case (length elements)
+             [(0) "()"]
+             [(1) (format "(~a)" (compile-expr (first elements)))]
+             [else (format "( ~a )"
+                           (string-join (map compile-expr elements)
+                                        ", "))])]))
            
 (define (compile-binary-operator expr)
   (match expr
