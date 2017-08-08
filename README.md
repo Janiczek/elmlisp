@@ -63,9 +63,7 @@ Or from a file:
 $ elmlisp input.ell
 ```
 
-### Download:
-
-- [v0.0.5 (Linux 64bit)](https://raw.githubusercontent.com/Janiczek/elmlisp/0.0.5/dist/elmlisp)
+### Download [here!](https://github.com/Janiczek/elmlisp/releases)
 
 ### Compiling from source (also requires Racket!):
 
