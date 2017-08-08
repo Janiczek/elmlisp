@@ -1,0 +1,3 @@
+(case maybe
+  (Nothing 1)
+  ((Just val) val))

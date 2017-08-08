@@ -251,4 +251,10 @@
          [`(case ,var . ,cases)
            (format "case ~a of\n~a"
                    (compile-expr var)
-                   (format-cases cases))]))
+                   (format-cases
+                     (map compile-one-case cases)))]))
+
+(define (compile-one-case case)
+  (match case
+         [`(,constructor ,value)
+          `(,constructor ,(compile-expr value))]))

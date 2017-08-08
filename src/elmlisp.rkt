@@ -1,15 +1,10 @@
 #lang racket
 
-; TODO: all 'module' definitions to the top, from whenever user or macro calls (module)
-; TODO: all 'import' to the top, alphabetically sorted
-
-; TODO: optionally use elm-format on the resulting file(s)?
-
 (require "compile.rkt")
 
 (provide compile)
 
-(define version "0.0.5")
+(define version "0.0.6")
 
 ; 1. read the cmdline arguments (currently we only accept a filename to compile
 (define arguments (current-command-line-arguments))
@@ -27,5 +22,8 @@
     ; read from a file
     (file->string (vector-ref arguments 0))))
 
-; 6. display the result (TODO: allow writing to a file)
-(displayln (compile file-contents))
+; 3. compile the ElmLisp code to Elm code
+(define elm-code (compile file-contents))
+
+; 4. display it (TODO: allow writing to a file)
+(displayln elm-code)

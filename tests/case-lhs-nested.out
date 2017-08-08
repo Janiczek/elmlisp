@@ -1,0 +1,6 @@
+case maybe of
+    Nothing ->
+        1
+
+    Just val ->
+        val

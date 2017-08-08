@@ -1,0 +1,3 @@
+(case msg
+  (NoOp 1)
+  ((SetName _) 2))

@@ -39,9 +39,12 @@
     ", "))
 
 (define (format-exposed-adt adt)
-  (format "~a(~a)"
-          (first adt)
-          (string-join (map ~a (second adt)) ", ")))
+  (match adt
+         [`(,name ,constructors)
+          (format "~a(~a)"
+                  name
+                  (string-join (map ~a constructors) ", "))]))
+           
 
 ; used for all kinds of type annotations
 ; basically remove outermost parens but otherwise leave as is
@@ -80,17 +83,17 @@
 ; allows module, port module
 ; --------------------------
 ; TODO: effect module - will have to research this one a bit!
-(define (format-module e module-type)
-  (case (length e)
-    [(2)
-     (format "~a ~a exposing (..)"
-             module-type
-             (second e))]
-    [(4)
-     (format "~a ~a exposing (~a)"
-             module-type
-             (second e)
-             (format-exposing (fourth e)))])) 
+(define (format-module expr module-type)
+  (match expr
+         [`(,_ ,name)
+           (format "~a ~a exposing (..)"
+                   module-type
+                   name)]
+         [`(,_ ,name exposing ,exposed)
+           (format "~a ~a exposing (~a)"
+                   module-type
+                   name
+                   (format-exposing exposed))]))
 
 ; used for (type)
 ; ---------------
@@ -115,4 +118,11 @@
 ; ((Inc 1) ((IncBy amount) amount)) => Inc -> 1 \n IncBy amount -> amount
 ; -----------------------
 (define (format-cases cases)
-  "1")
+  (string-join (map format-case cases) "\n\n"))
+
+(define (format-case case)
+  (match case
+         [`(,constructor ,value)
+          (format "    ~a ->\n        ~a"
+                  (format-type constructor)
+                  value)]))

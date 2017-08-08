@@ -1,0 +1,6 @@
+case msg of
+    NoOp ->
+        1
+
+    SetName _ ->
+        2

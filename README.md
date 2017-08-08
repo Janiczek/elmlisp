@@ -104,7 +104,6 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 
 - [ ] `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
 - [ ] `(type-alias)` with records
-- [ ] `(case)` (tests) both with and without wildcard, and destructuring
 - [ ] `(let)` (with destructuring too)
 
 - [ ] comments

@@ -1,0 +1,6 @@
+case bool of
+    True ->
+        1
+
+    False ->
+        0
