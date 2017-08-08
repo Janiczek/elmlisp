@@ -61,8 +61,8 @@
      (case (first e)
 
            ; Macros -- the magic sauce!
-           [(define-syntax)      (handle-define-syntax e)]
-           [(define-syntax-rule) (handle-define-syntax-rule e)]
+           [(define-syntax
+              define-syntax-rule) (handle-macro e)]
 
            ; Flag as operator
            [(binary-operator
@@ -88,7 +88,7 @@
 (define (show-as-is expr)
   ((if (string? expr) ~s ~a) expr))
 
-(define (handle-define-syntax expr)
+(define (handle-macro expr)
   (define (register-macro id expr)
     (set-add! macros id)
     (eval expr ns)
@@ -98,14 +98,10 @@
            (register-macro id expr)]
 
          [`(define-syntax (,id ,_) ,_)
-           (register-macro id expr)]))
+           (register-macro id expr)]
 
-(define (handle-define-syntax-rule expr)
-  (match expr
          [`(define-syntax-rule (,id ,_))
-           (set-add! macros id)
-           (eval expr ns)
-           ""]))
+           (register-macro id expr)]))
 
 (define (handle-operator expr)
   (for ([op (rest expr)])
