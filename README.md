@@ -1,30 +1,27 @@
 # ElmLisp
-> An experimental LISP syntax for Elm language, and an ElmLisp → Elm transpiler. 
+An experimental LISP syntax for Elm language, and an ElmLisp → Elm transpiler. 
 
 ----
 
-What this enables us is one simple thing: **macros** and thus, less boilerplate!
+> But why???
 
-A small example:
+Because of one simple thing: **macros!** -- and thus, less boilerplate!
+
+----
+
+ElmLisp looks like this:
 
 ```racket
 (module Main)
 
 (type-alias Model Int)
 
-(type Msg
-  Inc
-  (DecBy Int))
-
-(def init : Model
-  0)
-
-(defn decBy : (-> Int Model Model)
-  (amount model)
-  (- model amount))
+(defn inc : (-> Model Model)
+  (model)
+  (+ model 1))
 ```
 
-becomes... (or, at least, it should when I'm done implementing it :sweat_smile:)
+Which becomes...
 
 ```elm
 module Main exposing (..)
@@ -32,48 +29,55 @@ module Main exposing (..)
 type alias Model =
     Int
 
+inc : Model -> Model
+inc model =
+    model + 1
+```
+
+So far, this is just a different syntax for Elm, and in itself is probably not worth writing in. **Being a LISP, though,** we can use macros to get rid of some boilerplate! Let's see, a hypothetical macro could turn:
+
+```racket
+(msg-and-update
+  (Inc         Inc            (+ model 1))
+  ((DecBy Int) (DecBy amount) (- model amount))
+  (Reset       Reset          0))
+```
+
+into:
+
+```elm
 type Msg
     = Inc
     | DecBy Int
+    | Reset
 
-init : Model
-init =
-    0
+update msg model =
+    case msg of
+        Inc ->
+            model + 1
 
-decBy : Int -> Model -> Model
-decBy amount model =
-    model - amount
+        DecBy amount ->
+            model - amount
+
+        Reset ->
+            0
 ```
 
-So far, this is just a different syntax for Elm, and in itself is not worth writing in (at least I wouldn't!). **Being a LISP, though,** we can use macros to get rid of some boilerplate! Let's see:
-
-**TODO:** example of macro usage!
+**TODO:** think of a more believable macro ;) and finish this section.
 
 ----
 
-### Usage:
-
-You can read input code from STDIN:
-```
-$ elmlisp
-```
-
-Or from a file:
-```
-$ elmlisp input.ell
-```
-
 ### Download [here!](https://github.com/Janiczek/elmlisp/releases)
 
-### Compiling from source (also requires Racket!):
+### Usage:
 
-This will create an `elmlisp` binary in the src/ folder:
+- Read input code from STDIN: `$ elmlisp`
+- Or from a file: `$ elmlisp input.ell`
 
-```
-$ raco exe src/elmlisp.rkt
-```
+If you have Racket installed:
 
-Alternatively, you can run the compiler with Racket interpreter instead of a binary, simply substitute `elmlisp` for `racket src/elmlisp.rkt` (this requires Racket).
+- You can run ElmLisp interpreted: `$ racket src/elmlisp.rkt`
+- Or compile it from source: `$ raco exe src/elmlisp.rkt`
 
 ----
 
@@ -87,11 +91,11 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
     - compile.rkt - The meat of the application. Compiles s-expressions into Elm source code strings.
     - helpers.rkt - Various helpers and predicates for the compiler.
 
+- examples/ - Examples just for you :) Largely complete Elm modules showcasing ElmLisp.
 - tests/ - Diff tests - input files and expected output files. Look here for examples of ElmLisp!
 
 - run_tests.sh - Test runner watcher (runs test_runner.rkt when src/ or tests/ changes).
 - test_runner.rkt - Script for running the test suite once.
- 
 ```
 
 ----
@@ -120,6 +124,7 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 - refactoring of `compile.rkt` into helper funtions in `format.rkt` (all the `(format "..." ...)` calls)
 
 #### Research
+- import of other ElmLisp files? (just of their macros?)
 - how will `#t` and `#f` vs `True` and `False` play out in macros etc.?
 - maybe try creating a `(where)` alternative to `(let)` as an macro, if that even makes sense in ElmLisp
 
