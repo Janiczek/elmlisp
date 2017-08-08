@@ -17,7 +17,7 @@ ElmLisp looks like this:
 (type-alias Model Int)
 
 (defn inc : (-> Model Model)
-  (model)
+  [model]
   (+ model 1))
 ```
 
@@ -74,7 +74,7 @@ update msg model =
 - Read input code from STDIN: `$ elmlisp`
 - Or from a file: `$ elmlisp input.ell`
 
-If you have Racket installed:
+If you have [Racket installed](https://download.racket-lang.org/):
 
 - You can run ElmLisp interpreted: `$ racket src/elmlisp.rkt`
 - Or compile it from source: `$ raco exe src/elmlisp.rkt`
@@ -113,7 +113,6 @@ If you have Racket installed:
 - extensible records!
 
 #### Nice to have
-- square brackets for defn arguments will probably be nicer... my Clojure heritage shows :)
 - somehow break up long lines (eg. any substantial `view` function)
 - some commandline friendliness, dude
 - all the `(module)` definitions rendered at the top (it's technically an error, but we let the Elm compiler tell you that)

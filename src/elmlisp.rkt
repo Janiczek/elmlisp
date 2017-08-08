@@ -4,7 +4,7 @@
 
 (provide compile)
 
-(define version "0.0.11")
+(define version "0.0.12")
 
 ; 1. read the cmdline arguments (currently we only accept a filename to compile
 (define arguments (current-command-line-arguments))
@@ -17,6 +17,7 @@
     (begin
      (displayln (format "ElmLisp ~a" version))
      (displayln "Enter code (^D when done):")
+     (displayln "--------------------------")
      (port->string))
 
     ; read from a file

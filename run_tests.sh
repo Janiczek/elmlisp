@@ -29,6 +29,7 @@ function show_compiler_errors {
   echo -e "${RED}\nErrors:\n${COLOR_OFF}$(cat ${ERRORS_FILE})\n";
 }
 
+echo 'Initializing...'
 compile;
 
 if [[ -z $(cat ${ERRORS_FILE}) ]]; then
