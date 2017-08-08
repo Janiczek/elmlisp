@@ -262,18 +262,18 @@
 (define (compile-defn expr)
   (match expr
          [`(defn ,name ,arguments ,body)
-           (format "~a ~a =\n    ~a"
+           (format "~a ~a =\n~a"
                    name
                    (format-arguments arguments)
-                   (compile-expr body))]
+                   (indent (compile-expr body)))]
 
          [`(defn ,name : ,type ,arguments ,body)
-           (format "~a : ~a\n~a ~a =\n    ~a"
+           (format "~a : ~a\n~a ~a =\n~a"
                    name
                    (format-type type)
                    name
                    (format-arguments arguments)
-                   (compile-expr body))]))
+                   (indent (compile-expr body)))]))
 
 (define (compile-if expr)
   (match expr

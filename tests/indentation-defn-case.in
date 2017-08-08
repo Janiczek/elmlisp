@@ -1,0 +1,5 @@
+(defn update : (-> Msg Model Model)
+ (msg model)
+ (case msg
+   (Inc (+ 1 model))
+   (Dec (- 1 model))))

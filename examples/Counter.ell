@@ -1,0 +1,28 @@
+(module Counter)
+
+(import Html exposing (Html div text button))
+(import Html.Attributes exposing (onClick))
+
+(def main : (Program Never Model Msg)
+     (Html.beginnerProgram
+       {model model
+        update update
+        view view}))
+       
+(type-alias Model Int)
+
+(type Msg
+  Inc
+  Dec)
+
+(defn update : (-> Msg Model Model)
+ (msg model)
+ (case msg
+   (Inc (+ 1 model))
+   (Dec (- 1 model))))
+
+(defn view : (-> Model (Html Msg))
+ (model)
+ (div [] [(button [(onClick Dec)] [(text "-1")])
+          (text (toString model))
+          (button [(onClick Inc)] [(text "+1")])]))

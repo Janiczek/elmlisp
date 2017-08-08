@@ -110,6 +110,7 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 - extensible records!
 
 #### Nice to have
+- somehow break up long lines (eg. any substantial `view` function)
 - some commandline friendliness, dude
 - all the `(module)` definitions rendered at the top (it's technically an error, but we let the Elm compiler tell you that)
 - all the `(import)` definitions rendered at the top, sorted (even if some macro called it in the middle of the file)
@@ -120,7 +121,7 @@ Alternatively, you can run the compiler with Racket interpreter instead of a bin
 - refactoring of `compile.rkt` into helper funtions in `format.rkt` (all the `(format "..." ...)` calls)
 
 #### Research
-- how will #t and #f vs True and False play out in macros etc.?
+- how will `#t` and `#f` vs `True` and `False` play out in macros etc.?
 - maybe try creating a `(where)` alternative to `(let)` as an macro, if that even makes sense in ElmLisp
 
 ----

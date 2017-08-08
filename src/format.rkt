@@ -2,6 +2,7 @@
 
 (provide wrap-in-parens
          format-compiled-code
+         indent
          format-exposing
          format-type
          format-module
@@ -10,11 +11,12 @@
          format-cases
          format-record-pair-value)
 
-(require "helpers.rkt")
+(require threading
+         "helpers.rkt")
 
 ; when reading a file, wrap all its s-exprs into one list
 (define (wrap-in-parens string)
- (string-append "(" string ")"))
+ (format "(~a)" string))
 
 ; combine all Elm source code strings to one
 (define (format-compiled-code list)
@@ -22,6 +24,17 @@
         list
         "\n\n"
         #:after-last "\n")))
+
+(define (indent string)
+  (~> string
+      (string-split "\n"
+                    #:trim? #f)
+      (map (lambda (line)
+             (if (equal? line "")
+               line
+               (format "    ~a" line)))
+       _)
+      (string-join "\n")))
 
 ; used for "exposing (foo bar)"
 ;                    ^^^^^^^^^

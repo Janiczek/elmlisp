@@ -1,0 +1,8 @@
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        Inc ->
+            1 + model
+
+        Dec ->
+            1 - model

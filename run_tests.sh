@@ -43,7 +43,7 @@ inotifywait -mqr -e close_write,move,create,delete --format '%w %e %f' ./tests .
 
   #echo "event: ${EVENT} // dir: ${DIR} // file: ${FILE}" >>events.txt # debugging
 
-  if [ "${DIR}" == "./src/" ] || [ "${DIR}" == "./test_runner.rkt" ]; then
+  if [ "${FILE}" != "elmlisp" ] && [ "${DIR}" == "./src/" ] || [ "${DIR}" == "./test_runner.rkt" ]; then
     recompile;
   fi;
 
