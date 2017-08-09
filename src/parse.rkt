@@ -81,14 +81,10 @@
                                            (current-readtable)
                                            ch #\{ #f))))
   (define list (syntax->list list-syntax))
-  (define (groups-of-2 vals acc)
-    (match vals
-           [`()              acc]
-           [`(,a ,b . ,rest) (groups-of-2 rest (append acc `((,a ,b))))]))
   (unless (even? (length list))
     (raise-user-error "ERROR: A record with uneven number of forms was found."))
   (datum->syntax
     list-syntax
-    #`(elm-record #,@(groups-of-2 list '()))
+    #`(elm-record #,@(sequence->list (in-slice 2 list)))
     list-syntax
     list-syntax))
