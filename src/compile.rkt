@@ -87,6 +87,7 @@
         [(defn)        (compile-defn e)]
         [(if)          (compile-if e)]
         [(case)        (compile-case e)]
+        [(let)         (compile-let e)]
 
         [else (compile-function-call e)])]))
 
@@ -318,6 +319,33 @@
   (match case
          [`(,constructor ,value)
            `(,constructor ,(compile-expr value))]))
+
+(define (compile-let expr)
+  (match expr
+         [`(let (elm-list . ,bindings) ,body)
+           (begin
+             (unless (not (empty? list))
+               (raise-user-error "ERROR: A (let) form with empty bindings was found."))
+             (unless (even? (length bindings))
+               (raise-user-error "ERROR: A (let) form with uneven number of bindings was found."))
+             (format "let\n~a\nin\n~a"
+                     (indent (compile-bindings bindings))
+                     (compile-expr body)))]))
+                     
+
+(define (compile-bindings bindings)
+  (~>> bindings
+       (in-slice 2)
+       (sequence->list)
+       (map compile-binding)
+       (string-join _ "\n")))
+
+(define (compile-binding binding)
+  (match binding
+         [`(,name ,value)
+          (format "~a =\n    ~a"
+                  name
+                  (compile-expr value))]))
 
 (define (compile-function-call expr)
   (format "~a ~a"
