@@ -73,6 +73,9 @@ update msg model =
 
 - Read input code from STDIN: `$ elmlisp`
 - Or from a file: `$ elmlisp input.ell`
+- Format the result with [elm-format](https://github.com/avh4/elm-format): `$ elmlisp -f`
+- Output to a file: `$ elmlisp -o Output.elm`
+- Display help: `$ elmlisp -h`
 
 If you have [Racket installed](https://download.racket-lang.org/):
 
@@ -113,10 +116,8 @@ If you have [Racket installed](https://download.racket-lang.org/):
 
 #### Nice to have
 - somehow break up long lines (eg. any substantial `view` function)
-- some commandline friendliness, dude
 - all the `(module)` definitions rendered at the top (it's technically an error, but we let the Elm compiler tell you that)
 - all the `(import)` definitions rendered at the top, sorted (even if some macro called it in the middle of the file)
-- maybe use `elm-format` on the result? cmd-line option for that?
 
 #### Meh
 - `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
