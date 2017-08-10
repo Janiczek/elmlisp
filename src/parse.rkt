@@ -72,6 +72,16 @@
     list-syntax
     list-syntax))
 
+(define/contract (elm-record-stx list-syntax list)
+                 (-> any/c 
+                     (flat-named-contract 'even-sized-list (compose even? length)) 
+                     syntax?)
+  (datum->syntax
+    list-syntax
+    #`(elm-record #,@(sequence->list (in-slice 2 list)))
+    list-syntax
+    list-syntax))
+
 ; {abc def ...} -> (elm-record (abc def) ...)
 (define (read-elm-record ch in src ln col pos)
   (define list-syntax
@@ -81,10 +91,4 @@
                                            (current-readtable)
                                            ch #\{ #f))))
   (define list (syntax->list list-syntax))
-  (unless (even? (length list))
-    (raise-user-error "ERROR: A record with uneven number of forms was found."))
-  (datum->syntax
-    list-syntax
-    #`(elm-record #,@(sequence->list (in-slice 2 list)))
-    list-syntax
-    list-syntax))
+  (elm-record-stx list-syntax list))
