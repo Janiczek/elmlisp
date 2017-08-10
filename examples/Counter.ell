@@ -16,13 +16,13 @@
   Dec)
 
 (defn update : (-> Msg Model Model)
- (msg model)
+ [msg model]
  (case msg
    (Inc (+ 1 model))
    (Dec (- 1 model))))
 
 (defn view : (-> Model (Html Msg))
- (model)
+ [model]
  (div [] [(button [(onClick Dec)] [(text "-1")])
           (text (toString model))
           (button [(onClick Inc)] [(text "+1")])]))

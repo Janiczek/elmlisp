@@ -1,7 +1,5 @@
 #lang racket
 
-(require syntax/readerr)
-
 (provide parse)
 
 ; Let Racket reader do the heavy lifting (String -> S-exprs).
@@ -34,6 +32,7 @@
                   'dispatch-macro
                   read-elm-tuple
                   
+                  ; treat {} as (elm-record)
                   #\{
                   'terminating-macro
                   read-elm-record))
@@ -82,15 +81,10 @@
                                            (current-readtable)
                                            ch #\{ #f))))
   (define list (syntax->list list-syntax))
-  (define (groups-of-2 vals acc)
-    (match vals
-           [`()              acc]
-           [`(,a ,b . ,rest) (groups-of-2 rest (append acc `((,a ,b))))]))
   (unless (even? (length list))
-    (raise-read-error "Records must have an even number of forms"
-                      src ln col pos (syntax-span list-syntax)))
+    (raise-user-error "ERROR: A record with uneven number of forms was found."))
   (datum->syntax
     list-syntax
-    #`(elm-record #,@(groups-of-2 list '()))
+    #`(elm-record #,@(sequence->list (in-slice 2 list)))
     list-syntax
     list-syntax))

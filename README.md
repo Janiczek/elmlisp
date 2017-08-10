@@ -17,7 +17,7 @@ ElmLisp looks like this:
 (type-alias Model Int)
 
 (defn inc : (-> Model Model)
-  (model)
+  [model]
   (+ model 1))
 ```
 
@@ -73,8 +73,11 @@ update msg model =
 
 - Read input code from STDIN: `$ elmlisp`
 - Or from a file: `$ elmlisp input.ell`
+- Format the result with [elm-format](https://github.com/avh4/elm-format): `$ elmlisp -f`
+- Output to a file: `$ elmlisp -o Output.elm`
+- Display help: `$ elmlisp -h`
 
-If you have Racket installed:
+If you have [Racket installed](https://download.racket-lang.org/):
 
 - You can run ElmLisp interpreted: `$ racket src/elmlisp.rkt`
 - Or compile it from source: `$ raco exe src/elmlisp.rkt`
@@ -105,20 +108,16 @@ If you have Racket installed:
 #### Minimum Viable Product
 
 - examples of macros
-- `(let)` (with destructuring too)
 - comments (either make `;` stay in the Elm code as `--`, or have `(-- ...)` or something)
-- destructuring (in fn arguments and other places, ADTs with one constructor, etc.)
-- operator `||`, `|>`, `<|` (ditch/change verbatim syntax and let `||` be a symbol)
+- destructuring (in fn arguments, let and other places, ADTs with one constructor, etc.)
+- [(link)](https://www.reddit.com/r/Racket/comments/6sco7r/disabling_verbatim_behaviour/) operator `||`, `|>`, `<|` (ditch/change verbatim syntax and let `||` be a symbol)
 - record updating
 - extensible records!
 
 #### Nice to have
-- square brackets for defn arguments will probably be nicer... my Clojure heritage shows :)
 - somehow break up long lines (eg. any substantial `view` function)
-- some commandline friendliness, dude
 - all the `(module)` definitions rendered at the top (it's technically an error, but we let the Elm compiler tell you that)
 - all the `(import)` definitions rendered at the top, sorted (even if some macro called it in the middle of the file)
-- maybe use `elm-format` on the result? cmd-line option for that?
 
 #### Meh
 - `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!

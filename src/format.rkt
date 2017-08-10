@@ -128,16 +128,18 @@
   (string-join (map format-type constructors)
                "\n    | "))
 
-; used in lambdas (maybe will be used in more places?)
+; used in lambdas and defn
 ; -------------------
 ; TODO: destructuring
 ; -------------------
-; x     => x
 ; (x y) => x y
+; [x y] => x y
 (define (format-arguments arguments)
-  (if (list? arguments)
-    (string-join (map ~a arguments) " ")
-    (~a arguments)))
+  (match arguments
+         [`(elm-list . ,args)
+          (string-join (map ~a args) " ")]
+         [`,args
+           (string-join (map ~a args) " ")]))
 
 ; ((True 1) (False 0))              => True -> 1 \n False -> 0
 ; ((Inc 1) ((IncBy amount) amount)) => Inc -> 1 \n IncBy amount -> amount
