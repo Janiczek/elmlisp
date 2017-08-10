@@ -9,9 +9,9 @@
 
 (define (is-arrow-type? expr)
   (and (list? expr)
-       (eq? (first expr) '->)))
+       (equal? (first expr) '->)))
   
 
 (define (is-record? expr)
   (and (list? expr)
-       (eq? (first expr) 'elm-record)))
+       (equal? (first expr) 'elm-record)))
