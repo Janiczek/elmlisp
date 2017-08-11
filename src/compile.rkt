@@ -30,7 +30,7 @@
 
 ; Operators
 (define binary-operators    (mutable-set '! '::))
-(define variadic-operators  (mutable-set '&& '+ '- '* '/ '// '% '^ '++ '<< '>>)) 
+(define variadic-operators  (mutable-set '&& '\|\| '+ '- '* '/ '// '% '^ '++ '<< '>>)) 
 (define variadic-predicates (mutable-set '== '/= '< '> '<= '>=)) 
 
 ; This is where we emit Elm code.

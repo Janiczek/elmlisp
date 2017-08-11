@@ -5,7 +5,8 @@
 ; Let Racket reader do the heavy lifting (String -> S-exprs).
 ; We change it up a bit with our modified readtable...
 (define (parse code)
-  (parameterize ([current-readtable (elmlisp-readtable)])
+  (parameterize ([current-readtable (elmlisp-readtable)]
+                 [read-accept-bar-quote #f])
     (read (open-input-string code))))
 
 ; readtable allowing us to read stuff differently (colon, [], {}, #[])

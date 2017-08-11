@@ -110,7 +110,6 @@ If you have [Racket installed](https://download.racket-lang.org/):
 - examples of macros
 - comments (either make `;` stay in the Elm code as `--`, or have `(-- ...)` or something)
 - destructuring (in fn arguments, let and other places, ADTs with one constructor, etc.)
-- [(link)](https://www.reddit.com/r/Racket/comments/6sco7r/disabling_verbatim_behaviour/) operator `||`, `|>`, `<|` (ditch/change verbatim syntax and let `||` be a symbol)
 - record updating
 - extensible records!
 
