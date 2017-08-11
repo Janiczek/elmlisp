@@ -1,0 +1,3 @@
+(|> myList
+  (List.filter isOdd)
+  List.length)

@@ -4,7 +4,7 @@
 
 (provide compile)
 
-(define version "0.0.15")
+(define version "0.0.16")
 (define program-name (format "ElmLisp ~a" version))
 
 ; 1. read the cmdline arguments (currently we only accept a filename to compile
