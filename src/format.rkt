@@ -12,6 +12,7 @@
          format-record-pair-value)
 
 (require threading
+         (only-in srfi/13 string-null?)
          "helpers.rkt")
 
 ; when reading a file, wrap all its s-exprs into one list
@@ -26,15 +27,12 @@
         #:after-last "\n")))
 
 (define (indent string)
-  (~> string
-      (string-split "\n"
-                    #:trim? #f)
-      (map (lambda (line)
-             (if (equal? line "")
-               line
-               (format "    ~a" line)))
-       _)
-      (string-join "\n")))
+  (string-join
+    (for/list ([line (in-lines (open-input-string string))])
+              (if (string-null? line)
+                line
+                (format "    ~a" line)))
+    "\n"))
 
 ; used for "exposing (foo bar)"
 ;                    ^^^^^^^^^
@@ -52,12 +50,11 @@
          list)
     ", "))
 
-(define (format-exposed-adt adt)
-  (match adt
-         [`(,name ,constructors)
-          (format "~a(~a)"
-                  name
-                  (string-join (map ~a constructors) ", "))]))
+(define/match (format-exposed-adt adt)
+ [(`(,name ,constructors))
+  (format "~a(~a)"
+          name
+          (string-join (map ~a constructors) ", "))])
            
 
 ; used for all kinds of type annotations
@@ -96,10 +93,9 @@
                                 (rest type)) 
                                " , "))]))
 
-(define (format-record-pair-rhs pair)
-  (match pair
-        [`(,field ,type)
-         `(,field ,(format-type type))]))
+(define/match (format-record-pair-rhs pair)
+ [(`(,field ,type))
+  `(,field ,(format-type type))])
 
 (define (format-arrow-type type)
   (string-join (map (lambda (type-part)
@@ -108,17 +104,16 @@
                " -> "))
 
 ; allows module, port module
-(define (format-module expr module-type)
-  (match expr
-         [`(,_ ,name)
-           (format "~a ~a exposing (..)"
-                   module-type
-                   name)]
-         [`(,_ ,name exposing ,exposed)
-           (format "~a ~a exposing (~a)"
-                   module-type
-                   name
-                   (format-exposing exposed))]))
+(define/match (format-module expr module-type)
+ [(`(,_ ,name) _)
+  (format "~a ~a exposing (..)"
+          module-type
+          name)]
+ [(`(,_ ,name exposing ,exposed) _)
+  (format "~a ~a exposing (~a)"
+          module-type
+          name
+          (format-exposing exposed))])
 
 ; used for (type)
 ; ---------------
@@ -134,12 +129,11 @@
 ; -------------------
 ; (x y) => x y
 ; [x y] => x y
-(define (format-arguments arguments)
-  (match arguments
-         [`(elm-list . ,args)
-          (string-join (map ~a args) " ")]
-         [`,args
-           (string-join (map ~a args) " ")]))
+(define/match (format-arguments arguments)
+ [(`(elm-list . ,args))
+  (string-join (map ~a args) " ")]
+ [(`,args)
+  (string-join (map ~a args) " ")])
 
 ; ((True 1) (False 0))              => True -> 1 \n False -> 0
 ; ((Inc 1) ((IncBy amount) amount)) => Inc -> 1 \n IncBy amount -> amount
@@ -147,23 +141,20 @@
 (define (format-cases cases)
   (string-join (map format-case cases) "\n\n"))
 
-(define (format-case case)
-  (match case
-         [`(,constructor ,value)
-          (format "    ~a ->\n        ~a"
-                  (format-type constructor)
-                  value)]))
+(define/match (format-case case)
+ [(`(,constructor ,value))
+  (format "    ~a ->\n        ~a"
+          (format-type constructor)
+          value)])
 
-(define (format-record-pair-type pair)
-  (match pair
-         [`(,field ,value)
-          (format "~a : ~a"
-                  field
-                  value)]))
+(define/match (format-record-pair-type pair)
+ [(`(,field ,value))
+  (format "~a : ~a"
+          field
+          value)])
 
-(define (format-record-pair-value pair)
-  (match pair
-         [`(,field ,value)
-          (format "~a = ~a"
-                  field
-                  value)]))
+(define/match (format-record-pair-value pair)
+ [(`(,field ,value))
+  (format "~a = ~a"
+          field
+          value)])

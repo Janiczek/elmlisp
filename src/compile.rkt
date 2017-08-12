@@ -94,20 +94,20 @@
 (define (show-as-is expr)
   ((if (string? expr) ~s ~a) expr))
 
-(define (handle-macro expr)
-  (define (register-macro id expr)
-    (set-add! macros id)
-    (eval expr ns)
-    "")
-  (match expr
-         [`(define-syntax ,id . ,_)
-           (register-macro id expr)]
+(define (register-macro id expr)
+  (set-add! macros id)
+  (eval expr ns)
+  "")
 
-         [`(define-syntax (,id ,_) ,_)
-           (register-macro id expr)]
+(define/match (handle-macro expr)
+ [(`(define-syntax ,id . ,_))
+  (register-macro id expr)]
 
-         [`(define-syntax-rule (,id . ,_) . ,_)
-           (register-macro id expr)]))
+ [(`(define-syntax (,id ,_) ,_))
+  (register-macro id expr)]
+
+ [(`(define-syntax-rule (,id . ,_) . ,_))
+  (register-macro id expr)])
 
 (define (handle-operator expr)
   (for ([op (rest expr)])
@@ -119,92 +119,84 @@
          op))
   "")
 
-(define (compile-list expr)
-  (match expr
-         [`(elm-list . ,elements)
-           (case (length elements)
-             [(0) "[]"]
-             [else (format "[ ~a ]"
-                           (string-join (map compile-expr elements)
-                                        ", "))])]))
+(define/match (compile-list expr)
+ [(`(elm-list . ,elements))
+  (case (length elements)
+    [(0) "[]"]
+    [else (format "[ ~a ]"
+                  (string-join (map compile-expr elements)
+                               ", "))])])
 
-(define (compile-tuple expr)
-  (match expr
-         [`(elm-tuple . ,elements)
-           (case (length elements)
-             [(0) "()"]
-             [(1) (format "(~a)" (compile-expr (first elements)))]
-             [else (format "( ~a )"
-                           (string-join (map compile-expr elements)
-                                        ", "))])]))
+(define/match (compile-tuple expr)
+ [(`(elm-tuple . ,elements))
+  (case (length elements)
+    [(0) "()"]
+    [(1) (format "(~a)" (compile-expr (first elements)))]
+    [else (format "( ~a )"
+                  (string-join (map compile-expr elements)
+                               ", "))])])
 
-(define (compile-record expr)
-  (match expr
-         [`(elm-record . ,elements)
-           (case (length elements)
-             [(0) "{}"]
-             [else (format "{ ~a }"
-                           (string-join
-                             (map (compose format-record-pair-value
-                                           compile-one-record-field)
-                                  elements)
-                             ", "))])]))
+(define/match (compile-record expr)
+ [(`(elm-record . ,elements))
+  (case (length elements)
+    [(0) "{}"]
+    [else (format "{ ~a }"
+                  (string-join
+                    (map (compose format-record-pair-value
+                                  compile-one-record-field)
+                         elements)
+                    ", "))])])
 
-(define (compile-one-record-field pair)
-  (match pair
-         [`(,field ,value)
-           `(,field ,(compile-expr value))]))
+(define/match (compile-one-record-field pair)
+ [(`(,field ,value))
+  `(,field ,(compile-expr value))])
 
-(define (compile-binary-operator expr #:nested? [nested? #f])
-  (match expr
-         [`(,op ,a ,b)
-           (format (if nested? "(~a ~a ~a)" "~a ~a ~a")
-                   (compile-expr a #:nested? #t)
-                   op
-                   (compile-expr b #:nested? #t))]))
+(define/match (compile-binary-operator expr #:nested? [nested? #f])
+ [(`(,op ,a ,b) _)
+  (format (if nested? "(~a ~a ~a)" "~a ~a ~a")
+          (compile-expr a #:nested? #t)
+          op
+          (compile-expr b #:nested? #t))])
 
-(define (compile-variadic-operator expr #:nested? [nested? #f])
-  (define format-string
-    (if nested?
-      "(~a ~a ~a)"
-      "~a ~a ~a"))
-  (match expr
-         [`(,op ,a)
-           (~a a)]
+(define (variadic-operator-format-string nested?)
+  (if nested? "(~a ~a ~a)" "~a ~a ~a"))
 
-         [`(,op ,a ,(? list? b))
-           (format format-string
-                   (compile-expr a #:nested? #t)
-                   op
-                   (compile-expr b #:nested? #t))]
+(define/match (compile-variadic-operator expr #:nested? [nested? #f])
+ [(`(,op ,a) _)
+  (~a a)]
 
-         [`(,op ,a ,b)
-           (format format-string
-                   (compile-expr a #:nested? #t)
-                   op
-                   (compile-expr b #:nested? #t))]
+ [(`(,op ,a ,(? list? b)) _)
+  (format (variadic-operator-format-string nested?)
+          (compile-expr a #:nested? #t)
+          op
+          (compile-expr b #:nested? #t))]
 
-         [`(,op . ,arguments)
-           (format (if nested? "(~a)" "~a")
-                   (string-join
-                     (map (lambda (sub-expr)
-                            (compile-expr sub-expr #:nested? #t))
-                          arguments)
-                     (format " ~a " op)))]))
+ [(`(,op ,a ,b) _)
+  (format (variadic-operator-format-string nested?)
+          (compile-expr a #:nested? #t)
+          op
+          (compile-expr b #:nested? #t))]
 
-(define (compile-variadic-predicate expr)
-  (match expr
-         [`(,op ,a ,b . ,rest)
-           (if (empty? rest)
-             (format "~a ~a ~a"
-                     (compile-expr a)
-                     op
-                     (compile-expr b))
-             (format "~a ~a ~a && ~a"
-                     (compile-expr a)
-                     op
-                     (compile-expr b)
-                     (compile-variadic-predicate `(,op ,b ,@rest))))]))
+ [(`(,op . ,arguments) _)
+  (format (if nested? "(~a)" "~a")
+          (string-join
+            (map (lambda (sub-expr)
+                   (compile-expr sub-expr #:nested? #t))
+                 arguments)
+            (format " ~a " op)))])
+
+(define/match (compile-variadic-predicate expr)
+ [(`(,op ,a ,b . ,rest))
+  (if (empty? rest)
+    (format "~a ~a ~a"
+            (compile-expr a)
+            op
+            (compile-expr b))
+    (format "~a ~a ~a && ~a"
+            (compile-expr a)
+            op
+            (compile-expr b)
+            (compile-variadic-predicate `(,op ,b ,@rest))))])
 
 (define (compile-module expr)
   (format-module expr "module"))
@@ -212,125 +204,113 @@
 (define (compile-port-module expr)
   (format-module expr "port module"))
 
-(define (compile-import expr)
-  (match expr
-         [`(import ,name)
-           (format "import ~a"
-                   name)]
+(define/match (compile-import expr)
+ [(`(import ,name))
+  (format "import ~a"
+          name)]
 
-         [`(import ,name as ,alias)
-           (format "import ~a as ~a"
-                   name
-                   alias)]
+ [(`(import ,name as ,alias))
+  (format "import ~a as ~a"
+          name
+          alias)]
 
-         [`(import ,name exposing ,exposed)
-           (format "import ~a exposing (~a)"
-                   name
-                   (format-exposing exposed))]
+ [(`(import ,name exposing ,exposed))
+  (format "import ~a exposing (~a)"
+          name
+          (format-exposing exposed))]
 
-         [`(import ,name as ,alias exposing ,exposed)
-           (format "import ~a as ~a exposing (~a)"
-                   name
-                   alias
-                   (format-exposing exposed))]))
+ [(`(import ,name as ,alias exposing ,exposed))
+  (format "import ~a as ~a exposing (~a)"
+          name
+          alias
+          (format-exposing exposed))])
 
-(define (compile-type-alias expr)
-  (match expr
-         [`(type-alias ,alias ,type)
-           (format "type alias ~a =\n    ~a"
-                   (format-type alias)
-                   (format-type type))]))
+(define/match (compile-type-alias expr)
+ [(`(type-alias ,alias ,type))
+  (format "type alias ~a =\n    ~a"
+          (format-type alias)
+          (format-type type))])
 
-(define (compile-type expr)
-  (match expr
-         [`(type ,name . ,constructors)
-           (format "type ~a\n    = ~a"
-                   (format-type name)
-                   (format-type-definition constructors))]))
+(define/match (compile-type expr)
+ [(`(type ,name . ,constructors))
+  (format "type ~a\n    = ~a"
+          (format-type name)
+          (format-type-definition constructors))])
 
-(define (compile-input-port expr)
-  (match expr
-         [`(input-port ,name ,type)
-           (format "port ~a : (~a -> msg) -> Sub msg"
-                   name
-                   (format-type type))]))
+(define/match (compile-input-port expr)
+ [(`(input-port ,name ,type))
+  (format "port ~a : (~a -> msg) -> Sub msg"
+          name
+          (format-type type))])
 
-(define (compile-output-port expr)
-  (match expr
-         [`(output-port ,name ,type)
-           (format "port ~a : ~a -> Cmd msg"
-                   name
-                   (format-type type))]))
+(define/match (compile-output-port expr)
+ [(`(output-port ,name ,type))
+  (format "port ~a : ~a -> Cmd msg"
+          name
+          (format-type type))])
 
-(define (compile-lambda expr)
-  (match expr
-         [`(lambda ,arguments ,body)
-           (format "\\~a -> ~a"
-                   (format-arguments arguments)
-                   (compile-expr body))]))
+(define/match (compile-lambda expr)
+ [(`(lambda ,arguments ,body))
+  (format "\\~a -> ~a"
+          (format-arguments arguments)
+          (compile-expr body))])
 
-(define (compile-def expr)
-  (match expr
-         [`(def ,name ,definition)
-           (format "~a =\n    ~a"
-                   name
-                   definition)]
+(define/match (compile-def expr)
+ [(`(def ,name ,definition))
+  (format "~a =\n    ~a"
+          name
+          definition)]
 
-         [`(def ,name : ,type ,definition)
-           (format "~a : ~a\n~a =\n    ~a"
-                   name
-                   (format-type type)
-                   name
-                   (compile-expr definition))]))
+ [(`(def ,name : ,type ,definition))
+  (format "~a : ~a\n~a =\n    ~a"
+          name
+          (format-type type)
+          name
+          (compile-expr definition))])
 
-(define (compile-defn expr)
-  (match expr
-         [`(defn ,name ,arguments ,body)
-           (format "~a ~a =\n~a"
-                   name
-                   (format-arguments arguments)
-                   (indent (compile-expr body)))]
+(define/match (compile-defn expr)
+ [(`(defn ,name ,arguments ,body))
+  (format "~a ~a =\n~a"
+          name
+          (format-arguments arguments)
+          (indent (compile-expr body)))]
 
-         [`(defn ,name : ,type ,arguments ,body)
-           (format "~a : ~a\n~a ~a =\n~a"
-                   name
-                   (format-type type)
-                   name
-                   (format-arguments arguments)
-                   (indent (compile-expr body)))]))
+ [(`(defn ,name : ,type ,arguments ,body))
+  (format "~a : ~a\n~a ~a =\n~a"
+          name
+          (format-type type)
+          name
+          (format-arguments arguments)
+          (indent (compile-expr body)))])
 
-(define (compile-if expr)
-  (match expr
-         [`(if ,condition ,then ,else)
-           (format "if ~a then\n    ~a\nelse\n    ~a"
-                   (compile-expr condition)
-                   (compile-expr then)
-                   (compile-expr else))]))
+(define/match (compile-if expr)
+ [(`(if ,condition ,then ,else))
+  (format "if ~a then\n    ~a\nelse\n    ~a"
+          (compile-expr condition)
+          (compile-expr then)
+          (compile-expr else))])
 
-(define (compile-case expr)
-  (match expr
-         [`(case ,var . ,cases)
-           (format "case ~a of\n~a"
-                   (compile-expr var)
-                   (format-cases
-                     (map compile-one-case cases)))]))
+(define/match (compile-case expr)
+ [(`(case ,var . ,cases))
+  (format "case ~a of\n~a"
+          (compile-expr var)
+          (format-cases
+            (map compile-one-case cases)))])
 
-(define (compile-one-case case)
-  (match case
-         [`(,constructor ,value)
-           `(,constructor ,(compile-expr value))]))
+(define/match (compile-one-case case)
+ [(`(,constructor ,value))
+  `(,constructor ,(compile-expr value))])
 
-(define (compile-let expr)
-  (match expr
-         [`(let (elm-list . ,bindings) ,body)
-           (begin
-             (unless (not (empty? list))
-               (raise-user-error "ERROR: A (let) form with empty bindings was found."))
-             (unless (even? (length bindings))
-               (raise-user-error "ERROR: A (let) form with uneven number of bindings was found."))
-             (format "let\n~a\nin\n~a"
-                     (indent (compile-bindings bindings))
-                     (compile-expr body)))]))
+(define/match (compile-let expr)
+ [(`(let (elm-list . ,bindings) ,body))
+  (begin
+    (unless (not (empty? list))
+      (raise-user-error "ERROR: A (let) form with empty bindings was found."))
+    (unless (even? (length bindings))
+      (raise-user-error "ERROR: A (let) form with uneven number of bindings was found."))
+    (format "let\n~a\nin\n~a"
+            (indent (compile-bindings bindings))
+            (compile-expr body)))])
                      
 
 (define (compile-bindings bindings)
@@ -340,12 +320,11 @@
        (map compile-binding)
        (string-join _ "\n")))
 
-(define (compile-binding binding)
-  (match binding
-         [`(,name ,value)
-          (format "~a =\n    ~a"
-                  name
-                  (compile-expr value))]))
+(define/match (compile-binding binding)
+ [(`(,name ,value))
+  (format "~a =\n    ~a"
+          name
+          (compile-expr value))])
 
 (define (compile-function-call expr)
   (format "~a ~a"
