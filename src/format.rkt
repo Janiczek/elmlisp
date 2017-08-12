@@ -12,6 +12,7 @@
          format-record-pair-value)
 
 (require threading
+         (only-in srfi/13 string-null?)
          "helpers.rkt")
 
 ; when reading a file, wrap all its s-exprs into one list
@@ -26,15 +27,12 @@
         #:after-last "\n")))
 
 (define (indent string)
-  (~> string
-      (string-split "\n"
-                    #:trim? #f)
-      (map (lambda (line)
-             (if (equal? line "")
-               line
-               (format "    ~a" line)))
-       _)
-      (string-join "\n")))
+  (string-join
+    (for/list ([line (in-lines (open-input-string string))])
+      (if (string-null? line)
+        line
+        (format "    ~a" line)))
+    "\n"))
 
 ; used for "exposing (foo bar)"
 ;                    ^^^^^^^^^
@@ -96,10 +94,8 @@
                                 (rest type)) 
                                " , "))]))
 
-(define (format-record-pair-rhs pair)
-  (match pair
-        [`(,field ,type)
-         `(,field ,(format-type type))]))
+(define/match (format-record-pair-rhs pair)
+  [(`(,field ,type)) `(,field ,(format-type type))])
 
 (define (format-arrow-type type)
   (string-join (map (lambda (type-part)
