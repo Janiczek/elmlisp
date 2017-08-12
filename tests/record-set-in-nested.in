@@ -1,0 +1,2 @@
+(set-in myRecord abc
+  (set-in anotherRecord def 123))

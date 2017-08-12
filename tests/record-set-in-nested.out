@@ -1,0 +1,1 @@
+{ myRecord | abc = { anotherRecord | def = 123 } }

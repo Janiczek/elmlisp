@@ -88,6 +88,7 @@
         [(if)          (compile-if e)]
         [(case)        (compile-case e)]
         [(let)         (compile-let e)]
+        [(set-in)      (compile-set-in e)]
 
         [else (compile-function-call e)])]))
 
@@ -330,3 +331,18 @@
   (format "~a ~a"
           (compile-expr (first expr))
           (string-join (map compile-expr (rest expr)) " ")))
+
+;(define (nested-record? symbol)
+;  (~> symbol
+;      symbol->string
+;      (string-contains? ".")))
+
+(define/match (compile-set-in expr)
+;  [(`(set-in ,(? nested-record? record) ,field ,value))
+;   (compile-expr `(let []))
+  [(`(set-in ,record ,field ,value))
+   (format "{ ~a | ~a = ~a }"
+           record
+           field
+           (compile-expr value))])
+  

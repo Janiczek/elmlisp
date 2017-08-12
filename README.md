@@ -110,13 +110,13 @@ If you have [Racket installed](https://download.racket-lang.org/):
 - examples of macros
 - comments (either make `;` stay in the Elm code as `--`, or have `(-- ...)` or something)
 - destructuring (in fn arguments, let and other places, ADTs with one constructor, etc.)
-- record updating
 - extensible records!
 
 #### Nice to have
 - somehow break up long lines (eg. any substantial `view` function)
 - all the `(module)` definitions rendered at the top (it's technically an error, but we let the Elm compiler tell you that)
 - all the `(import)` definitions rendered at the top, sorted (even if some macro called it in the middle of the file)
+- record updating of inner record fields (`(set-in user.address street "Main St.")` => `let` and all that boilerplate stuff) -- waits for `(let)`
 
 #### Meh
 - `(effect-module)` - read up on it, see what has to be specified. I suspect there is a potential macro lurking somewhere!
